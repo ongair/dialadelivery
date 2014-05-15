@@ -12,4 +12,5 @@
 
 class Outlet < ActiveRecord::Base
 	has_many :outlet_contacts
+	has_many :orders
 end

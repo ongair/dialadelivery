@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  customer_id: 
+  outlet_id: 
+  location_id: 
+  status: MyString
+
+two:
+  customer_id: 
+  outlet_id: 
+  location_id: 
+  status: MyString
