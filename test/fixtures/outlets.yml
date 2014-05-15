@@ -5,3 +5,8 @@ ngong_road:
   latitude: -1.299965
   longitude: 36.789738
 
+junction:
+  name: Pizza Inn Junction
+  latitude: -1.298225
+  longitude: 36.762011
+

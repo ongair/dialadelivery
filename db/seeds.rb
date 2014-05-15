@@ -5,3 +5,6 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
+
+Outlet.create! name: "Pizza Inn Ngong Road", latitude: -1.299965, longitude: 36.789738
+Outlet.create! name: "Pizza Inn Junction", latitude: -1.298225, longitude: 36.762011

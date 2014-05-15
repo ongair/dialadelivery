@@ -1,13 +1,13 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
-one:
-  name: MyString
+alaska:
+  name: Alaska
   latitude: 1.5
   longitude: 1.5
-  description: MyString
+  description: Somewhere over the rainbow
 
-two:
-  name: MyString
-  latitude: 1.5
-  longitude: 1.5
-  description: MyString
+office:
+  name: Office
+  latitude: -1.299191 
+  longitude: 36.760820
+  description: Sprout Office
