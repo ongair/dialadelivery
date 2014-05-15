@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  outlet_id: 
+  phone_number: MyString
+  priority: 1
+
+two:
+  outlet_id: 
+  phone_number: MyString
+  priority: 1

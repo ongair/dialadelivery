@@ -11,11 +11,39 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140515142925) do
+ActiveRecord::Schema.define(version: 20140515204329) do
 
   create_table "customers", force: true do |t|
     t.string   "name"
     t.string   "phone_number"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "outlet_contacts", force: true do |t|
+    t.integer  "outlet_id"
+    t.string   "phone_number"
+    t.integer  "priority"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "outlet_contacts", ["outlet_id"], name: "index_outlet_contacts_on_outlet_id"
+
+  create_table "outlets", force: true do |t|
+    t.string   "name"
+    t.float    "latitude"
+    t.float    "longitude"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "pizzas", force: true do |t|
+    t.string   "name"
+    t.float    "medium_price"
+    t.float    "small_price"
+    t.float    "large_price"
+    t.string   "code"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

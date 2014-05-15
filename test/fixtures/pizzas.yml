@@ -1,0 +1,8 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+hawaiian:
+  name: Hawaiian
+  medium_price: 800
+  small_price: 600
+  large_price: 1000
+  code: A

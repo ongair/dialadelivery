@@ -29,6 +29,7 @@ gem 'jbuilder', '~> 1.2'
 gem 'annotate'
 gem 'pry'
 gem 'pry-nav'
+gem 'figaro'
 
 group :doc do
   # bundle exec rake doc:rails generates the API under doc/api.

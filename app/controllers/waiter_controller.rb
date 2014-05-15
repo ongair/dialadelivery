@@ -3,9 +3,14 @@ class WaiterController < ApplicationController
 	skip_before_action :verify_authenticity_token 
   	before_action :set_customer, only: [:order]
 
-	def order
-		# binding.pry
+	def order		
+		if is_start_word? params[:text]
+		end
 		render json: { success: true }
+	end
+
+	def is_start_word? text
+		text.downcase == ENV['START'].downcase
 	end
 
 	def set_customer
