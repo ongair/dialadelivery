@@ -20,8 +20,7 @@ class ContactController < ApplicationController
 			params = {
 				'phone_number' => @customer.phone_number,
 				'token' => ENV['TOKEN'],
-				'text' => 'Thank you for choosing Dial-A-Delivery.\n
-							Please share your location using WhatsApp..'
+				'text' => 'Thank you for choosing Dial-A-Delivery. Please share your location using WhatsApp..'
 			}
 			response = Net::HTTP.post_form(url, params)
 		end
