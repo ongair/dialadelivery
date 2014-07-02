@@ -1,7 +1,8 @@
 Dialadelivery::Application.routes.draw do
 
-  mount Dashing::Engine, at: Dashing.config.engine_path
+  # mount Dashing::Engine, at: Dashing.config.engine_path
   post 'order' => 'waiter#order'
+  post 'begin' => 'contact#begin'
   
   root 'dashing/dashboards#index'
   # root_to 'dashing/dashboards'

@@ -1,5 +1,5 @@
 # Use this hook to configure Dashing bahaviors.
-Dashing.configure do |config|
+# Dashing.configure do |config|
   # Scheduler instance.
   # config.scheduler = ::Rufus::Scheduler.new
 
@@ -54,4 +54,4 @@ Dashing.configure do |config|
   # List of Devise models that should access the whole dashboard.
   # List the models. E.g: '[:user, :admin]'
   # config.devise_allowed_models = []
-end
+# end
