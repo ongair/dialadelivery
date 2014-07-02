@@ -4,7 +4,7 @@ Dialadelivery::Application.routes.draw do
   post 'order' => 'waiter#order'
   post 'begin' => 'contact#begin'
   
-  root 'dashing/dashboards#index'
+#  root 'dashing/dashboards#index'
   # root_to 'dashing/dashboards'
   
   # The priority is based upon order of creation: first created -> highest priority.
