@@ -15,4 +15,7 @@ class Order < ActiveRecord::Base
   belongs_to :customer
   belongs_to :outlet
   belongs_to :location
+  has_many :order_items
+
+  scope :pending, -> { where(status: "PENDING" ) }
 end

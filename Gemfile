@@ -31,6 +31,8 @@ gem 'pry'
 gem 'pry-nav'
 gem 'figaro'
 gem 'geocoder'
+gem 'dashing-rails'
+gem 'puma'
 
 group :doc do
   # bundle exec rake doc:rails generates the API under doc/api.
