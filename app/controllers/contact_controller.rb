@@ -5,25 +5,46 @@ class ContactController < ApplicationController
 	before_action :set_customer, only: [:begin, :ask_location]
 
 	def begin
-		if is_begin_word? params[:text]
-			ask_location
+		if params[:location]
+			#location code
+		elsif params[:text]
+			if is_begin_word? params[:text]
+				ask_location
+			else
+				wrong_query
+			end
 		end
 		render json: { success: true }
 	end
 
 	private
+		def get_response params
+			url = URI.parse(ENV['API_URL'])
+			response = Net::HTTP.post_form(url, params)
+		end
+
 		def is_begin_word? text
 			text.downcase == ENV['BEGIN'].downcase
 		end
+
+		def wrong_query
+			params = {
+				'phone_number' => @customer.phone_number,
+				'token' => ENV['TOKEN'],
+				'text' => "Sorry wrong query. Please send Dial-A-Delivery for delivery to your location"
+			}
+			get_response params			
+		end
+
 		def ask_location
-			url = URI.parse(ENV['API_URL'])
 			params = {
 				'phone_number' => @customer.phone_number,
 				'token' => ENV['TOKEN'],
 				'text' => 'Thank you for choosing Dial-A-Delivery. Please share your location using WhatsApp..'
 			}
-			response = Net::HTTP.post_form(url, params)
+			get_response params
 		end
+		
 		def set_customer
 			@customer = Customer.find_by_phone_number(params[:phone_number])
 			if @contact.nil?

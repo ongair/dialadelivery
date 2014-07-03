@@ -1,3 +1,4 @@
+#require 'test_helper'
 require File.dirname(__FILE__) + '/../test_helper'
 
 class ContactControllerTest < ActionController::TestCase
@@ -12,15 +13,11 @@ class ContactControllerTest < ActionController::TestCase
 		response = post :begin, { phone_number: "254722200200", name: "Trevor", text: "Dial-A-Delivery", notification_type: "MessageReceived" }
 		
 		assert_equal response.code, "200"
-
 	end
 
-	test "Should send message to customer after receipt of not pass phrase" do
+	test "Should send sorry wrong query message to customer after receipt of not pass phrase" do
 		response = post :begin, { phone_number: "254723140111", name: "Perci", text: "Dial", notification_type: "MessageReceived" }
 		
-		@customer = Customer.find_by_phone_number("254723140111")
-		assert !@customer.nil? 
-
+		assert_equal response.code, "200"
 	end
-
 end
