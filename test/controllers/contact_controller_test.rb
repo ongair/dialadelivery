@@ -16,8 +16,7 @@ class ContactControllerTest < ActionController::TestCase
 		@message = Message.last
 
 		assert_equal @message.customer.phone_number, "254723140111"
-		#assert_equal @message.text, "Hi Trevor! Thank you for choosing Dial-A-Delivery. Please share your location using WhatsApp to get the contacts of your nearest outlet"
-		assert_equal @message.text, "Thank you for choosing Dial-A-Delivery. Please share your location using WhatsApp.."
+		assert_equal @message.text, "Hi Trevor! Thank you for choosing Dial-A-Delivery. Please share your location using WhatsApp to get the contacts of your nearest outlet"
 	end
 
 	test "Should send sorry wrong query message to customer after receipt of not pass phrase" do
@@ -27,7 +26,7 @@ class ContactControllerTest < ActionController::TestCase
 		@message = Message.last
 
 		assert_equal @message.customer.phone_number, "254723140111"
-		assert_equal @message.text, "Sorry wrong query. Please send Dial-A-Delivery for delivery to your location"
+		assert_equal @message.text, "Sorry Perci. Please send Dial-A-Delivery for delivery to your location"
 	end
 
 	# test "It should return the closest outlet when a user sends their location" do

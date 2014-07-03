@@ -34,10 +34,10 @@ class ContactController < ApplicationController
 			params = {
 				'phone_number' => @customer.phone_number,
 				'token' => ENV['TOKEN'],
-				'text' => "Sorry wrong query. Please send Dial-A-Delivery for delivery to your location"
+				'text' => "Sorry #{@customer.name}. Please send Dial-A-Delivery for delivery to your location"
 			}
 			response = get_response params			
-			message = Message.create! :text => "Sorry wrong query. Please send Dial-A-Delivery for delivery to your location", :customer => @customer
+			message = Message.create! :text => "Sorry #{@customer.name}. Please send Dial-A-Delivery for delivery to your location", :customer => @customer
 			
 		end
 
@@ -45,10 +45,10 @@ class ContactController < ApplicationController
 			params = {
 				'phone_number' => @customer.phone_number,
 				'token' => ENV['TOKEN'],
-				'text' => 'Thank you for choosing Dial-A-Delivery. Please share your location using WhatsApp..'
+				'text' => "Hi #{@customer.name}! Thank you for choosing Dial-A-Delivery. Please share your location using WhatsApp to get the contacts of your nearest outlet"
 			}
 			response = get_response params
-			message = Message.create! :text => "Thank you for choosing Dial-A-Delivery. Please share your location using WhatsApp..", :customer => @customer
+			message = Message.create! :text => "Hi #{@customer.name}! Thank you for choosing Dial-A-Delivery. Please share your location using WhatsApp to get the contacts of your nearest outlet", :customer => @customer
 			
 		end
 
