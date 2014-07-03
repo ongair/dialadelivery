@@ -9,8 +9,8 @@ class ContactControllerTest < ActionController::TestCase
 	 	assert !@customer.nil? 
 	 end
 
-	test "Should send message to customer after receipt of pass phrase" do
-		response = post :begin, { phone_number: "254723140111", name: "Trevor", text: "Dial-A-Delivery", notification_type: "MessageReceived" }
+	test "Should send message to customer after receipt of pass phrase which should be case insensitive" do
+		response = post :begin, { phone_number: "254723140111", name: "Trevor", text: "Dial-a-delivery", notification_type: "MessageReceived" }
 		
 		# assert_equal response.code, "200"
 		@message = Message.last
@@ -29,9 +29,12 @@ class ContactControllerTest < ActionController::TestCase
 		assert_equal @message.text, "Sorry Perci. Please send Dial-A-Delivery for delivery to your location"
 	end
 
-	# test "It should return the closest outlet when a user sends their location" do
-	# 	response = post :begin, { phone_number: "254723140111", name: "Perci", notification_type: "LocationReceived", latitude: outlets(:ngong_road).latitude, longitude: outlets(:ngong_road).longitude }
+	test "It should return the closest outlet when a user sends their location" do
+		response = post :begin, { phone_number: "254723140111", address: "Ngong road", name: "Perci", notification_type: "LocationReceived", latitude: outlets(:ngong_road).latitude, longitude: outlets(:ngong_road).longitude }
 	# 	assert_equal response.code, "200"
-	#end
+
+		@message = Message.last
+		assert_equal @message.text, "Your nearest Dial-A-Delivery location near Ngong road is #{outlets(:ngong_road).name}"
+	end
 
 end

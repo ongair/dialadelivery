@@ -6,9 +6,9 @@ class ContactController < ApplicationController
 
 	def begin
 		puts ">>>>>> Params #{params}"
-		if params[:location]
+		if params[:notification_type] == "LocationReceived"
 			return_location
-		elsif params[:text]
+		elsif params[:notification_type] == "MessageReceived"
 			if is_begin_word? params[:text]
 				ask_location
 			else
@@ -53,7 +53,16 @@ class ContactController < ApplicationController
 		end
 
 		def return_location
-			#location code here
+			place = params[:address]
+			location = Location.create! :name => params[:address], :latitude => params[:latitude], :longitude => params[:longitude], :customer => @customer
+			outlet = Outlet.find_nearest location
+			params = {
+				'phone_number' => @customer.phone_number,
+				'token' => ENV['TOKEN'],
+				'text' => "Your nearest Dial-A-Delivery location near #{place} is #{outlet.name}"
+			}
+			response = get_response params
+			message = Message.create! :text => "Your nearest Dial-A-Delivery location near #{place} is #{outlet.name}", :customer => @customer
 		end
 
 		def set_customer
