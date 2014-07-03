@@ -1,26 +1,20 @@
 # == Schema Information
 #
-# Table name: orders
+# Table name: messages
 #
 #  id          :integer          not null, primary key
-#  customer_id :integer
-#  outlet_id   :integer
-#  location_id :integer
-#  status      :string(255)
+#  text        :string(255)
 #  created_at  :datetime
 #  updated_at  :datetime
+#  customer_id :integer
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
 one:
+  text: MyString
   customer_id: 
-  outlet_id: 
-  location_id: 
-  status: MyString
 
 two:
+  text: MyString
   customer_id: 
-  outlet_id: 
-  location_id: 
-  status: MyString

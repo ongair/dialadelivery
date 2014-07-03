@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: outlets
+#
+#  id         :integer          not null, primary key
+#  name       :string(255)
+#  latitude   :float
+#  longitude  :float
+#  created_at :datetime
+#  updated_at :datetime
+#
+
 require 'test_helper'
 
 class OutletTest < ActiveSupport::TestCase

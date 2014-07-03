@@ -20,8 +20,10 @@ class ContactController < ApplicationController
 
 	private
 		def get_response params
-			url = URI.parse(ENV['API_URL'])
-			response = Net::HTTP.post_form(url, params)
+			if Rails.env.production?
+				url = URI.parse(ENV['API_URL'])
+				response = Net::HTTP.post_form(url, params)
+			end
 		end
 
 		def is_begin_word? text
@@ -34,7 +36,9 @@ class ContactController < ApplicationController
 				'token' => ENV['TOKEN'],
 				'text' => "Sorry wrong query. Please send Dial-A-Delivery for delivery to your location"
 			}
-			get_response params			
+			response = get_response params			
+			message = Message.create! :text => "Sorry wrong query. Please send Dial-A-Delivery for delivery to your location", :customer => @customer
+			
 		end
 
 		def ask_location
@@ -43,7 +47,9 @@ class ContactController < ApplicationController
 				'token' => ENV['TOKEN'],
 				'text' => 'Thank you for choosing Dial-A-Delivery. Please share your location using WhatsApp..'
 			}
-			get_response params
+			response = get_response params
+			message = Message.create! :text => "Thank you for choosing Dial-A-Delivery. Please share your location using WhatsApp..", :customer => @customer
+			
 		end
 
 		def return_location
