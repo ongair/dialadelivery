@@ -5,8 +5,9 @@ class ContactController < ApplicationController
 	before_action :set_customer, only: [:begin, :ask_location]
 
 	def begin
+		puts ">>>>>> Params #{params}"
 		if params[:location]
-			#location code
+			return_location
 		elsif params[:text]
 			if is_begin_word? params[:text]
 				ask_location
@@ -44,7 +45,11 @@ class ContactController < ApplicationController
 			}
 			get_response params
 		end
-		
+
+		def return_location
+			#location code here
+		end
+
 		def set_customer
 			@customer = Customer.find_by_phone_number(params[:phone_number])
 			if @contact.nil?
