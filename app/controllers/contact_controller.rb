@@ -26,6 +26,13 @@ class ContactController < ApplicationController
 		end
 	end
 
+	def response_vcard params
+		if Rails.env.production?
+			url = URI.parse(ENV['API_VCARD_URL'])
+			response = Net::HTTP.post_form(url, params)
+		end
+	end
+
 	def is_begin_word? text
 		text.downcase == ENV['BEGIN'].downcase
 	end
@@ -68,11 +75,13 @@ class ContactController < ApplicationController
 		end
 
 		get_response params
+		if outlet
+			send_vcard params
+		end
 		message = Message.create! :customer => @customer
 		if outlet
 			message.text = "Your nearest Dial-A-Delivery location near #{place} is #{outlet.name}"
 			message.save
-			send_vcard params
 		else
 			message.text = "Sorry #{@customer.name} we do not yet have an outlet near #{place}"
 			message.save
@@ -80,9 +89,7 @@ class ContactController < ApplicationController
 	end
 
 	def send_vcard params
-		puts ">>>>>>#{params}"
 		params.delete('text')
-		puts ">>>>>>#{params}"
 		params['contact_number'] = {}
 
 		count = 0
@@ -91,10 +98,11 @@ class ContactController < ApplicationController
 		outlet = Outlet.find_nearest location
 
 		outlet.outlet_contacts.each do |contact_number|
-			params['contact_number'][count] = contact_number.phone_number
+			params['contact_number'][count.to_s] = contact_number.phone_number
 			count = count + 1
 		end
-		response = get_response params
+		puts ">>>>>>#{params}"
+		response = response_vcard params
 	end
 
 	def set_customer
