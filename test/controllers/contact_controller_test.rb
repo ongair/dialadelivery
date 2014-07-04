@@ -10,27 +10,27 @@ class ContactControllerTest < ActionController::TestCase
 	 end
 
 	test "Should send message to customer after receipt of pass phrase which should be case insensitive" do
-		response = post :begin, { phone_number: "254723140111", name: "Trevor", text: "Dial-a-delivery", notification_type: "MessageReceived" }
+		response = post :begin, { phone_number: "254716085380", name: "Trevor", text: "Dial-a-delivery", notification_type: "MessageReceived" }
 		
 		# assert_equal response.code, "200"
 		@message = Message.last
 
-		assert_equal @message.customer.phone_number, "254723140111"
+		assert_equal @message.customer.phone_number, "254716085380"
 		assert_equal @message.text, "Hi Trevor! Thank you for choosing Dial-A-Delivery. Please share your location using WhatsApp to get the contacts of your nearest outlet"
 	end
 
 	test "Should send sorry wrong query message to customer after receipt of not pass phrase" do
-		response = post :begin, { phone_number: "254723140111", name: "Perci", text: "Dial", notification_type: "MessageReceived" }
+		response = post :begin, { phone_number: "254716085380", name: "Rachael", text: "Dial", notification_type: "MessageReceived" }
 		
 		# assert_equal response.code, "200"
 		@message = Message.last
 
-		assert_equal @message.customer.phone_number, "254723140111"
-		assert_equal @message.text, "Sorry Perci. Please send Dial-A-Delivery for delivery to your location"
+		assert_equal @message.customer.phone_number, "254716085380"
+		assert_equal @message.text, "Sorry Rachael. Please send Dial-A-Delivery for delivery to your location"
 	end
 
 	test "It should return the closest outlet when a user sends their location" do
-		response = post :begin, { phone_number: "254723140111", address: "Ngong road", name: "Perci", notification_type: "LocationReceived", latitude: outlets(:ngong_road).latitude, longitude: outlets(:ngong_road).longitude }
+		response = post :begin, { phone_number: "254716085380", address: "Ngong road", name: "Rachael", notification_type: "LocationReceived", latitude: outlets(:ngong_road).latitude, longitude: outlets(:ngong_road).longitude }
 	# 	assert_equal response.code, "200"
 
 		@message = Message.last
@@ -38,10 +38,14 @@ class ContactControllerTest < ActionController::TestCase
 	end
 
 	test "It should return a message that there is no close outlet if they are too far away" do
-		response = post :begin, { phone_number: "254723140111", address: "Mombasa", name: "Perci", notification_type: "LocationReceived", latitude: -4.0434771, longitude: 39.6682065 }
+		response = post :begin, { phone_number: "254716085380", address: "Mombasa", name: "Rachael", notification_type: "LocationReceived", latitude: -4.0434771, longitude: 39.6682065 }
 		
 		@message = Message.last
-		assert_equal @message.text, "Sorry Perci we do not yet have an outlet near Mombasa"
+		assert_equal @message.text, "Sorry Rachael we do not yet have an outlet near Mombasa"
 	end
 
+	test "It should send a message with the contact details of the nearest outlet" do
+		response = post :begin, { phone_number: "254716085380", address: "Ngong road", name: "Rachael", notification_type: "LocationReceived", latitude: outlets(:ngong_road).latitude, longitude: outlets(:ngong_road).longitude }
+		assert_equal response.code, "200"
+	end
 end
