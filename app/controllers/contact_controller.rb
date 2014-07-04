@@ -91,7 +91,7 @@ class ContactController < ApplicationController
 		outlet = Outlet.find_nearest location
 
 		outlet.outlet_contacts.each do |contact_number|
-			params['contact_number'][count] = contact_number
+			params['contact_number'][count] = contact_number.phone_number
 			count = count + 1
 		end
 		response = get_response params
