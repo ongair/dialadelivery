@@ -37,4 +37,11 @@ class ContactControllerTest < ActionController::TestCase
 		assert_equal @message.text, "Your nearest Dial-A-Delivery location near Ngong road is #{outlets(:ngong_road).name}"
 	end
 
+	test "It should return a message that there is no close outlet if they are too far away" do
+		response = post :begin, { phone_number: "254723140111", address: "Mombasa", name: "Perci", notification_type: "LocationReceived", latitude: -4.0434771, longitude: 39.6682065 }
+		
+		@message = Message.last
+		assert_equal @message.text, "Sorry Perci we do not yet have an outlet near Mombasa"
+	end
+
 end
