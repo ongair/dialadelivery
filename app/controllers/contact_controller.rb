@@ -89,13 +89,12 @@ class ContactController < ApplicationController
 	end
 
 	def send_vcard params
-		params.delete('text')
+		# params.delete('text')
 		params['first_name'] = "Dial-A-Delivery"
 		params['contact_number'] = []
 
 		location = Location.last
 		outlet = Outlet.find_nearest location
-		outlet_contacts = OutletContact.all.to_a
 
 		outlet.outlet_contacts.each do |contact_number|
 			 params['contact_number'].push contact_number.phone_number

@@ -13,11 +13,11 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
 one:
-  outlet_id: 500320549
-  phone_number: "254712451223"
-  priority: 1
+ outlet_id: 500320549
+ phone_number: "254712451223"
+ priority: 1
 
 two:
-  outlet_id: 486605684
-  phone_number: "254732764899"
-  priority: 1
+ outlet_id: 486605684
+ phone_number: "254732764899"
+ priority: 1
