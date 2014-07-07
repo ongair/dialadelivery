@@ -37,6 +37,7 @@ gem 'pry'
 gem 'pry-nav'
 gem 'figaro'
 gem 'geocoder'
+gem 'rails_admin'
 # gem 'dashing-rails'
 # gem 'puma'
 

@@ -1,5 +1,6 @@
 Dialadelivery::Application.routes.draw do
 
+  mount RailsAdmin::Engine => '/admin', :as => 'rails_admin'
   # mount Dashing::Engine, at: Dashing.config.engine_path
   post 'order' => 'waiter#order'
   post 'begin' => 'contact#begin'
