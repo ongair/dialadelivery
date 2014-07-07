@@ -103,6 +103,7 @@ class ContactController < ApplicationController
 
 		puts ">>>>#{params}"
 		response = response_vcard params
+		
 	end
 
 	def set_customer
