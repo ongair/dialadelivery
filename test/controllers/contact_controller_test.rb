@@ -46,9 +46,7 @@ class ContactControllerTest < ActionController::TestCase
 
 	test "It should send a message with the contact details of the nearest outlet" do
 		response = post :begin, { phone_number: "254723140111", address: "Ngong road", name: "Rachael", notification_type: "LocationReceived", latitude: outlets(:ngong_road).latitude, longitude: outlets(:ngong_road).longitude }
-		
-		puts ">>>>>#{response.code}"
-		puts ">>>>>#{response.body}"
+	
 		assert_equal response.code, "200"
 	end
 end

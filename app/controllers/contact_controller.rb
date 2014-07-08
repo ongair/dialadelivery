@@ -75,9 +75,9 @@ class ContactController < ApplicationController
 		end
 
 		get_response params
-		if outlet
-			send_vcard params
-		end
+		# if outlet
+		# 	send_vcard params
+		# end
 		message = Message.create! :customer => @customer
 		if outlet
 			message.text = "Your nearest Dial-A-Delivery location near #{place} is #{outlet.name}"
@@ -89,7 +89,7 @@ class ContactController < ApplicationController
 	end
 
 	def send_vcard params
-		# params.delete('text')
+		params.delete('text')
 		params['first_name'] = "Dial-A-Delivery"
 		params['contact_number'] = []
 

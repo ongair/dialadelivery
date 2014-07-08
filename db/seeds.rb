@@ -24,7 +24,7 @@ outlet2 = Outlet.all[1].id
 
 
 OutletContact.find_or_create_by_phone_number_and_outlet_id! outlet_id: outlet1, phone_number: "254722946639"
-OutletContact.find_or_create_by_phone_number_and_outlet_id! outlet_id: outlet1, phone_number: "254712345635"
+#OutletContact.find_or_create_by_phone_number_and_outlet_id! outlet_id: outlet1, phone_number: "254712345635"
 
 OutletContact.find_or_create_by_phone_number_and_outlet_id! outlet_id: outlet2, phone_number: "254722784921"
-OutletContact.find_or_create_by_phone_number_and_outlet_id! outlet_id: outlet2, phone_number: "254722784921"
+#OutletContact.find_or_create_by_phone_number_and_outlet_id! outlet_id: outlet2, phone_number: "254722784921"
