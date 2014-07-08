@@ -20,7 +20,7 @@ Dialadelivery::Application.configure do
   # config.action_dispatch.rack_cache = true
 
   # Disable Rails's static asset server (Apache or nginx will already do this).
-  config.serve_static_assets = false
+  config.serve_static_assets = true
 
   # Compress JavaScripts and CSS.
   config.assets.js_compressor = :uglifier
@@ -33,6 +33,7 @@ Dialadelivery::Application.configure do
   config.assets.digest = true
 
   # Version of your assets, change this if you want to expire all your assets.
+  config.assets.initialize_on_precompile = false
   config.assets.version = '1.0'
   config.assets.precompile += ['rails_admin/rails_admin.css', 'rails_admin/rails_admin.js']
 
