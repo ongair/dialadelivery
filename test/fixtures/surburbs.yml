@@ -1,0 +1,20 @@
+# == Schema Information
+#
+# Table name: surburbs
+#
+#  id         :integer          not null, primary key
+#  name       :string(255)
+#  outlet_id  :integer
+#  created_at :datetime
+#  updated_at :datetime
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  name: ihub
+  outlet_id: 500320549
+
+two:
+  name: jamuhuri
+  outlet_id: 486605684
