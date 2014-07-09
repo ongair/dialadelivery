@@ -39,7 +39,6 @@ class ContactController < ApplicationController
 	# end
 
 	def get_surburb text
-		# surburb = Surburb.find_by_name text
 		surburb = Surburb.where(Surburb.arel_table[:name].matches(text)).take
 	end
 
@@ -92,6 +91,7 @@ class ContactController < ApplicationController
 		}
 
 		response = get_response params
+		send_vcard params
 		message = Message.create! :customer=>@customer, :text=>"Your nearest Dial-A-Delivery location near #{surburb.name} is #{outlet.name}"
 	end
 
