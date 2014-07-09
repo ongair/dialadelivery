@@ -39,7 +39,7 @@ class ContactController < ApplicationController
 	# end
 
 	def get_surburb text
-		surburb = Surburb.find_by_name text.downcase
+		surburb = Surburb.find_by_name text
 	end
 
 	def ask_location
