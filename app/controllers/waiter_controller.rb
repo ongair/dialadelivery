@@ -5,10 +5,10 @@ class WaiterController < ApplicationController
 
 	def order
 		if params[:notification_type]=="MessageReceived"
-			if has_pending_orders?
-				process_text params[:text]
-			elsif is_start_word? params[:text]
+			if is_start_word? params[:text]
 				start_order
+			else
+				process_text params[:text]
 			end
 		elsif params[:notification_type]=="LocationReceived"
 			return_location
@@ -68,34 +68,65 @@ class WaiterController < ApplicationController
 	end
 
 	def process_text text
+		text.downcase!
 		options = {
-			'A' => 'Meat Deluxe',
-			'B' => 'Four Seasons',
-			'C' => 'Hawaiian',
-			'D' => 'Peri-Peri Chicken'
+			'a' => 'Meat Deluxe',
+			'b' => 'Four Seasons',
+			'c' => 'Hawaiian',
+			'd' => 'Peri-Peri Chicken'
 		}
 		sizes = {
-			'S' => 'Small',
-			'M' => 'Medium',
-			'L' => 'Large'
+			's' => 'Small',
+			'm' => 'Medium',
+			'l' => 'Large'
 		}
-		if Step.nil?
-			Step.create! :type=>"intro"
+		if Step.all.count == 0
+			Step.create! :type=>"order"
 		end
-		step_type = Step.last.step
-		
-		case step_type
-		when text =~ /\D/
-			if text.length == 3
+		step = Step.last
+		case step.type
+		when "order"
+			if  !options[text[1]].nil? && !sizes[text[2]].nil?
 				reply = "Your order details: "
-				reply = reply + text[0] +' '+ options[text[1]]+' '+sizes[text[2]]
-				response = get_response reply
-
-				
+				if text.length == 3 && text =~ /\D/
+					reply = reply + text[0] +' '+ options[text[1]]+' '+sizes[text[2]]
+					get_response reply
+					Message.create! :customer => @customer, :text => reply
+					num_size = [text[0]]
+					get_response "What free Pizza would you like to have?"
+					message = Message.create! :customer => @customer, :text => "What free Pizza would you like to have?"
+					step.type = "free"
+					step.save
+				else
+					reply = reply +'One '+ options[text[1]]+' '+sizes[text[2]]
+					get_response reply
+					Message.create! :customer => @customer, :text => reply
+					num_size = ["One"]
+					get_response "What free Pizza would you like to have?"
+					Message.create! :customer => @customer, :text => "What free Pizza would you like to have?"
+					step.type = "free"
+					step.save
+				end
+				num_size.push sizes[text[2]]
+			else
+				get_response "Sorry your entry is in wrong format."
+				Message.create! :customer => @customer, :text => "Sorry your entry is in wrong format."
+			end
+		when "free"
+			if text.length==1 && !options[text].nil?
+				main_order = "Your order details are as below, please confirm. "
+				main_order = main_order +"Main Order: "+ reply
+				main_order = main_order +"Free Pizza :"+num_size[0]+" "+options[[text]]+" "+num_size[1]
+				main_order = main_order+"Correct? (please reply with a yes or no)"
+				get_response main_order
+				Message.create! :customer => @customer, :text => main_order
+			else
+				get_response "Sorry your entry is in wrong format."
+				Message.create! :customer => @customer, :text => "Sorry your entry is in wrong format."
 			end
 		end
 	end
-
+	
 	def is_start_word? text
 		text.downcase == ENV['START'].downcase
 	end
