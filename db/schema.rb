@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140710084353) do
+ActiveRecord::Schema.define(version: 20140710093723) do
 
   create_table "customers", force: true do |t|
     t.string   "name"
@@ -97,9 +97,9 @@ ActiveRecord::Schema.define(version: 20140710084353) do
   end
 
   create_table "steps", force: true do |t|
-    t.string   "type"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "order_type"
   end
 
   create_table "surburbs", force: true do |t|

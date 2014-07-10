@@ -81,33 +81,35 @@ class WaiterController < ApplicationController
 			'l' => 'Large'
 		}
 		if Step.all.count == 0
-			Step.create! :type=>"order"
+			Step.create! :order_type=>"order"
 		end
 		step = Step.last
-		case step.type
+		case step.order_type
 		when "order"
 			if  !options[text[1]].nil? && !sizes[text[2]].nil?
 				reply = "Your order details: "
 				if text.length == 3 && text =~ /\D/
 					reply = reply + text[0] +' '+ options[text[1]]+' '+sizes[text[2]]
 					get_response reply
+					@reply = text[0] +' '+ options[text[1]]+' '+sizes[text[2]]
 					Message.create! :customer => @customer, :text => reply
-					num_size = [text[0]]
+					@num_size = [text[0]]
 					get_response "What free Pizza would you like to have?"
 					message = Message.create! :customer => @customer, :text => "What free Pizza would you like to have?"
-					step.type = "free"
+					step.order_type = "free"
 					step.save
 				else
 					reply = reply +'One '+ options[text[1]]+' '+sizes[text[2]]
 					get_response reply
+					@reply = 'One '+ options[text[1]]+' '+sizes[text[2]]
 					Message.create! :customer => @customer, :text => reply
-					num_size = ["One"]
+					@num_size = ["One"]
 					get_response "What free Pizza would you like to have?"
 					Message.create! :customer => @customer, :text => "What free Pizza would you like to have?"
-					step.type = "free"
+					step.order_type = "free"
 					step.save
 				end
-				num_size.push sizes[text[2]]
+				@num_size.push sizes[text[2]]
 			else
 				get_response "Sorry your entry is in wrong format."
 				Message.create! :customer => @customer, :text => "Sorry your entry is in wrong format."
@@ -115,15 +117,29 @@ class WaiterController < ApplicationController
 		when "free"
 			if text.length==1 && !options[text].nil?
 				main_order = "Your order details are as below, please confirm. "
-				main_order = main_order +"Main Order: "+ reply
-				main_order = main_order +"Free Pizza :"+num_size[0]+" "+options[[text]]+" "+num_size[1]
-				main_order = main_order+"Correct? (please reply with a yes or no)"
+				main_order = main_order+"Main Order: "+@reply
+				main_order = main_order+". "+"Free Pizza: "+@num_size[0]+" "+options[text]+" "+@num_size[1]
+				main_order = main_order+". Correct? (please reply with a yes or no)"
 				get_response main_order
 				Message.create! :customer => @customer, :text => main_order
+				step.order_type = "boolean"
+				step.save
 			else
 				get_response "Sorry your entry is in wrong format."
 				Message.create! :customer => @customer, :text => "Sorry your entry is in wrong format."
+				step.order_type = "boolean"
+				step.save
 			end
+		when "boolean"
+			if text == "yes"
+				final = "Thank you for ordering with Dial-a-Delivery, your pizza should be ready in 45 minutes, we hope you will be hungry by then :)"
+				
+			else
+				final = "Your order has been cancelled"
+			end
+			get_response final
+			Message.create! :customer => @customer, :text => final
+			Step.destroy_all
 		end
 	end
 	
