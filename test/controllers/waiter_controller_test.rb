@@ -53,4 +53,46 @@ class WaiterControllerTest < ActionController::TestCase
     message = Message.last
     assert_equal message.text, "Thank you for ordering with Dial-a-Delivery, your pizza should be ready in 45 minutes, we hope you will be hungry by then :)"
   end
+
+  test "Should handle wrong customer input during ordering" do
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "5bl", notification_type: "MessageReceived" }
+    message = Message.all[-2]
+    assert_equal message.text, "Your order details: 5 Four Seasons Large"
+    message = Message.last
+    assert_equal message.text, "What free Pizza would you like to have?"
+
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "x", notification_type: "MessageReceived" }
+    message = Message.last
+    assert_equal message.text, "Sorry wrong choice. Enter A,B,C or D"
+
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "A", notification_type: "MessageReceived" }
+    message = Message.last
+    assert_equal message.text, "Your order details are as below, please confirm. Main Order: 5 Four Seasons Large. Free Pizza: 5 Meat Deluxe Large. Correct? (please reply with a yes or no)"
+
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "yes", notification_type: "MessageReceived" }
+    message = Message.last
+    assert_equal message.text, "Thank you for ordering with Dial-a-Delivery, your pizza should be ready in 45 minutes, we hope you will be hungry by then :)"
+  end
+
+  test "Should allow a customer to cancel an order at any time by sending the word cancel" do
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "5bl", notification_type: "MessageReceived" }
+    message = Message.all[-2]
+    assert_equal message.text, "Your order details: 5 Four Seasons Large"
+    message = Message.last
+    assert_equal message.text, "What free Pizza would you like to have?"
+
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "x", notification_type: "MessageReceived" }
+    message = Message.last
+    assert_equal message.text, "Sorry wrong choice. Enter A,B,C or D"
+
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "Cancel", notification_type: "MessageReceived" }
+    message = Message.last
+    assert_equal message.text, "Your order has been cancelled."
+
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "1bl", notification_type: "MessageReceived" }
+    message = Message.all[-2]
+    assert_equal message.text, "Your order details: 1 Four Seasons Large"
+    message = Message.last
+    assert_equal message.text, "What free Pizza would you like to have?"
+  end
 end

@@ -80,82 +80,90 @@ class WaiterController < ApplicationController
 			'm' => 'Medium',
 			'l' => 'Large'
 		}
-		if Step.all.count == 0
-			Step.create! :order_type=>"order"
+
+		step = Step.find_by_customer_id @customer.id
+		if step.nil?
+			step = Step.create! :order_type=>"order", :customer=>@customer
 		end
-		step = Step.last
-		case step.order_type
-		when "order"
-			if  !options[text[1]].nil? && !sizes[text[2]].nil?
-				reply = "Your order details: "
-				if text.length == 3 && text =~ /\D/
-					reply = reply + text[0] +' '+ options[text[1]]+' '+sizes[text[2]]
-					get_response reply
-					@reply = text[0] +' '+ options[text[1]]+' '+sizes[text[2]]
-					Message.create! :customer => @customer, :text => reply
-					@num_size = [text[0]]
-					get_response "What free Pizza would you like to have?"
-					message = Message.create! :customer => @customer, :text => "What free Pizza would you like to have?"
-					step.order_type = "free"
+		# if step.order_type.nil?
+		# 	step.order_type = "order"
+		# 	step.save
+		# end
+		if text == 'cancel'
+			get_response "Your order has been cancelled."
+			Message.create! :customer => @customer, :text => "Your order has been cancelled."
+			step.delete
+		else
+			case step.order_type
+			when "order"
+				if  !options[text[1]].nil? && !sizes[text[2]].nil?
+					reply = "Your order details: "
+					if text.length == 3 && text =~ /\D/
+						reply = reply + text[0] +' '+ options[text[1]]+' '+sizes[text[2]]
+						get_response reply
+						@reply = text[0] +' '+ options[text[1]]+' '+sizes[text[2]]
+						Message.create! :customer => @customer, :text => reply
+						@num_size = [text[0]]
+						get_response "What free Pizza would you like to have?"
+						message = Message.create! :customer => @customer, :text => "What free Pizza would you like to have?"
+						step.order_type = "free"
+						step.save
+					else
+						reply = reply +'One '+ options[text[1]]+' '+sizes[text[2]]
+						get_response reply
+						@reply = 'One '+ options[text[1]]+' '+sizes[text[2]]
+						Message.create! :customer => @customer, :text => reply
+						@num_size = ["One"]
+						get_response "What free Pizza would you like to have?"
+						Message.create! :customer => @customer, :text => "What free Pizza would you like to have?"
+						step.order_type = "free"
+						step.save
+					end
+					@num_size.push sizes[text[2]]
+				else
+					get_response "Sorry your entry is in wrong format. Does not contain a digit and two letters"
+					Message.create! :customer => @customer, :text => "Sorry your entry is in wrong format. Does not contain a digit and two letters"
+				end
+			when "free"
+				if text.length==1 && !options[text].nil?
+					main_order = "Your order details are as below, please confirm. "
+					main_order = main_order+"Main Order: "+@reply
+					main_order = main_order+". "+"Free Pizza: "+@num_size[0]+" "+options[text]+" "+@num_size[1]
+					main_order = main_order+". Correct? (please reply with a yes or no)"
+					get_response main_order
+					Message.create! :customer => @customer, :text => main_order
+					step.order_type = "boolean"
 					step.save
 				else
-					reply = reply +'One '+ options[text[1]]+' '+sizes[text[2]]
-					get_response reply
-					@reply = 'One '+ options[text[1]]+' '+sizes[text[2]]
-					Message.create! :customer => @customer, :text => reply
-					@num_size = ["One"]
-					get_response "What free Pizza would you like to have?"
-					Message.create! :customer => @customer, :text => "What free Pizza would you like to have?"
-					step.order_type = "free"
-					step.save
+					get_response "Sorry wrong choice. Enter A,B,C or D"
+					Message.create! :customer => @customer, :text => "Sorry wrong choice. Enter A,B,C or D"
 				end
-				@num_size.push sizes[text[2]]
-			else
-				get_response "Sorry your entry is in wrong format."
-				Message.create! :customer => @customer, :text => "Sorry your entry is in wrong format."
+			when "boolean"
+				if text == "yes"
+					final = "Thank you for ordering with Dial-a-Delivery, your pizza should be ready in 45 minutes, we hope you will be hungry by then :)"
+				else
+					final = "Your order has been cancelled"
+				end
+				get_response final
+				Message.create! :customer => @customer, :text => final
+				step.delete
 			end
-		when "free"
-			if text.length==1 && !options[text].nil?
-				main_order = "Your order details are as below, please confirm. "
-				main_order = main_order+"Main Order: "+@reply
-				main_order = main_order+". "+"Free Pizza: "+@num_size[0]+" "+options[text]+" "+@num_size[1]
-				main_order = main_order+". Correct? (please reply with a yes or no)"
-				get_response main_order
-				Message.create! :customer => @customer, :text => main_order
-				step.order_type = "boolean"
-				step.save
-			else
-				get_response "Sorry your entry is in wrong format."
-				Message.create! :customer => @customer, :text => "Sorry your entry is in wrong format."
-				step.order_type = "boolean"
-				step.save
-			end
-		when "boolean"
-			if text == "yes"
-				final = "Thank you for ordering with Dial-a-Delivery, your pizza should be ready in 45 minutes, we hope you will be hungry by then :)"
-				
-			else
-				final = "Your order has been cancelled"
-			end
-			get_response final
-			Message.create! :customer => @customer, :text => final
-			Step.destroy_all
 		end
 	end
-	
-	def is_start_word? text
-		text.downcase == ENV['START'].downcase
-	end
 
-	def has_pending_orders?
-		!@customer.orders.pending.empty?
-	end
+def is_start_word? text
+	text.downcase == ENV['START'].downcase
+end
 
-	def set_customer
-		@customer = Customer.find_by_phone_number(params[:phone_number])
-		if @contact.nil?
-			@customer = Customer.create! phone_number: params[:phone_number], name: params[:name]
-		end
-		@customer
+def has_pending_orders?
+	!@customer.orders.pending.empty?
+end
+
+def set_customer
+	@customer = Customer.find_by_phone_number(params[:phone_number])
+	if @customer.nil?
+		@customer = Customer.create! phone_number: params[:phone_number], name: params[:name]
 	end
+	@customer
+end
 end
