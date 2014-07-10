@@ -124,7 +124,7 @@ class ContactController < ApplicationController
 			'text' => "Sorry #{@customer.name}. Please send a valid location name for delivery to where you are"
 		}
 		response = get_response params	
-		message = Message.create! :text => "Sorry #{@customer.name}. Please send a valid location name for delivery to where you are", :customer => @customer
+		message = Message.create! :text => "Sorry #{@customer.name}. Please share your location via WhatsApp", :customer => @customer
 	end
 
 	def set_customer
