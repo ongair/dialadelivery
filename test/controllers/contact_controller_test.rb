@@ -57,15 +57,13 @@ class ContactControllerTest < ActionController::TestCase
 		assert_equal @message.text, "Your nearest Dial-A-Delivery location near ihub is #{outlets(:ngong_road).name}"
 	end
 
-	# test "It should save an unknown location from text to an unapproved suburb" do
-	# 	response = post :begin, { phone_number: "254716085380", text: "Jogoo Rd", name: "Rachael", notification_type: "MessageReceived" }
+	test "It should save an unknown location from text to an unapproved suburb" do
+		response = post :begin, { phone_number: "254716085380", text: "Jogoo Rd", name: "Rachael", notification_type: "MessageReceived" }
 	
-	# 	@message = Message.last
-	# 	assert_equal @message.text, "Sorry Rachael. Please send a valid location name for delivery to where you are"
+		# @message = Message.last
+		# assert_equal @message.text, "Sorry Rachael. Please send a valid location name for delivery to where you are"
 
-	# 	jogoo_rd = Suburb.find_by(name: "Jogoo rd", approved: false)
-	# 	assert_equal true, !jogoo_rd.nil?
-	# end
-	
-
+		jogoo_rd = Surburb.find_by(name: "Jogoo Rd", approved: false)
+		assert_equal true, !jogoo_rd.nil?
+	end
 end

@@ -11,9 +11,13 @@ class ContactController < ApplicationController
 		elsif params[:notification_type] == "MessageReceived"
 			surburb = get_surburb params[:text]
 			if surburb
-				return_surburb surburb
+				if surburb.approved
+					return_surburb surburb
+				else
+					wrong_query
+				end
 			else
-				Surburb.create! name: params[:text], approved: false
+				Surburb.create :name=>params[:text], :approved=>false
 				wrong_query
 			end
 		end
