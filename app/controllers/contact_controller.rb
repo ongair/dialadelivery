@@ -39,23 +39,8 @@ class ContactController < ApplicationController
 		end
 	end
 
-	# def is_begin_word? text
-	# 	text.downcase == ENV['BEGIN'].downcase
-	# end
-
 	def get_surburb text
 		surburb = Surburb.where(Surburb.arel_table[:name].matches(text)).take
-	end
-
-	def ask_location
-		params = {
-			'phone_number' => @customer.phone_number,
-			'token' => ENV['TOKEN'],
-			'text' => "Hi #{@customer.name}! Thank you for choosing Dial-A-Delivery. Please share your location using WhatsApp to get the contacts of your nearest outlet"
-		}
-		response = get_response params
-		message = Message.create! :text => "Hi #{@customer.name}! Thank you for choosing Dial-A-Delivery. Please share your location using WhatsApp to get the contacts of your nearest outlet", :customer => @customer
-
 	end
 
 	def return_location
@@ -121,7 +106,7 @@ class ContactController < ApplicationController
 		params = {
 			'phone_number' => @customer.phone_number,
 			'token' => ENV['TOKEN'],
-			'text' => "Sorry #{@customer.name}. Please send a valid location name for delivery to where you are"
+			'text' => "Sorry #{@customer.name}. Please share your location via WhatsApp"
 		}
 		response = get_response params	
 		message = Message.create! :text => "Sorry #{@customer.name}. Please share your location via WhatsApp", :customer => @customer
@@ -134,9 +119,4 @@ class ContactController < ApplicationController
 		end
 		@customer
 	end
-
-	# def set_outlet
-	# 	location = Location.create! :name => params[:address], :latitude => params[:latitude], :longitude => params[:longitude], :customer => @customer
-	# 	@outlet = Outlet.find_nearest location
-	# end
 end
