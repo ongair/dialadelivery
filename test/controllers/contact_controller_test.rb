@@ -9,15 +9,15 @@ class ContactControllerTest < ActionController::TestCase
 	 	assert !@customer.nil? 
 	 end
 
-	test "Should send message to customer after receipt of pass phrase which should be case insensitive" do
-		response = post :begin, { phone_number: "254716085380", name: "Trevor", text: "Dial-a-delivery", notification_type: "MessageReceived" }
+	# test "Should send message to customer after receipt of pass phrase which should be case insensitive" do
+	# 	response = post :begin, { phone_number: "254716085380", name: "Trevor", text: "Dial-a-delivery", notification_type: "MessageReceived" }
 		
-		# assert_equal response.code, "200"
-		@message = Message.last
+	# 	# assert_equal response.code, "200"
+	# 	@message = Message.last
 
-		assert_equal @message.customer.phone_number, "254716085380"
-		assert_equal @message.text, "Hi Trevor! Thank you for choosing Dial-A-Delivery. Please share your location using WhatsApp to get the contacts of your nearest outlet"
-	end
+	# 	assert_equal @message.customer.phone_number, "254716085380"
+	# 	assert_equal @message.text, "Hi Trevor! Thank you for choosing Dial-A-Delivery. Please share your location using WhatsApp to get the contacts of your nearest outlet"
+	# end
 
 	test "Should send sorry wrong query message to customer after receipt of not pass phrase" do
 		response = post :begin, { phone_number: "254716085380", name: "Rachael", text: "Dial", notification_type: "MessageReceived" }
@@ -26,7 +26,7 @@ class ContactControllerTest < ActionController::TestCase
 		@message = Message.last
 
 		assert_equal @message.customer.phone_number, "254716085380"
-		assert_equal @message.text, "Sorry Rachael. Please send Dial-A-Delivery for delivery to your location"
+		assert_equal @message.text, "Sorry Rachael. Please send a valid location name for delivery to where you are"
 	end
 
 	test "It should return the closest outlet when a user sends their location" do
@@ -48,5 +48,12 @@ class ContactControllerTest < ActionController::TestCase
 		response = post :begin, { phone_number: "254716085380", address: "Ngong road", name: "Rachael", notification_type: "LocationReceived", latitude: outlets(:ngong_road).latitude, longitude: outlets(:ngong_road).longitude }
 	
 		assert_equal response.code, "200"
+	end
+
+	test "It should detect a location from the text received if a user sends in the location as a word" do
+		response = post :begin, { phone_number: "254716085380", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" }	
+
+		@message = Message.last
+		assert_equal @message.text, "Your nearest Dial-A-Delivery location near ihub is #{outlets(:ngong_road).name}"
 	end
 end

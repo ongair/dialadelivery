@@ -12,6 +12,7 @@
 
 class Outlet < ActiveRecord::Base
 	has_many :outlet_contacts
+	has_many :surburbs
 	has_many :orders
 	reverse_geocoded_by :latitude, :longitude
 
