@@ -13,6 +13,7 @@ class ContactController < ApplicationController
 			if surburb
 				return_surburb surburb
 			else
+				Surburb.create! name: params[:text], approved: false
 				wrong_query
 			end
 		end
@@ -84,6 +85,7 @@ class ContactController < ApplicationController
 
 	def return_surburb surburb
 		outlet = surburb.outlet
+
 		params = {
 			'phone_number' => @customer.phone_number,
 			'token' => ENV['TOKEN'],
