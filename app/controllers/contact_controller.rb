@@ -72,7 +72,7 @@ class ContactController < ApplicationController
 
 		get_response text
 		if outlet
-			send_vcard
+			send_vcard outlet
 		end
 		Message.create! :customer => @customer, :text => text
 	end
@@ -82,13 +82,11 @@ class ContactController < ApplicationController
 		text = ENV['OUTLET_MESSAGE'].gsub(/(?=\bis\b)/, surburb.name+' ')+' '+outlet.name
 
 		get_response text
-		send_vcard
+		send_vcard outlet
 		Message.create! :customer=>@customer, :text=>text
 	end
 
-	def send_vcard
-		location = Location.last
-		outlet = Outlet.find_nearest location
+	def send_vcard outlet
 		contact_number = []
 		outlet.outlet_contacts.each do |number|
 			contact_number.push number.phone_number
