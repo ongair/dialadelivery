@@ -65,7 +65,7 @@ class ContactController < ApplicationController
 		outlet = Outlet.find_nearest location
 		
 		if outlet
-			text = ENV['OUTLET_MESSAGE'].gsub(/(?=\bis\b)/, place+' ')+' '+outlet.name
+			text = ENV['OUTLET_MESSAGE'].gsub(/(?=\bis\b)/, place+' ')+' '+outlet.name.gsub(',','')
 		else
 			text = ENV['NO_OUTLET_MESSAGE'].gsub(/(?=\bwe\b)/, @customer.name+' ')+' '+place
 		end
@@ -79,7 +79,7 @@ class ContactController < ApplicationController
 
 	def return_surburb surburb
 		outlet = surburb.outlet
-		text = ENV['OUTLET_MESSAGE'].gsub(/(?=\bis\b)/, surburb.name+' ')+' '+outlet.name
+		text = ENV['OUTLET_MESSAGE'].gsub(/(?=\bis\b)/, surburb.name+' ')+' '+outlet.name.gsub(',','')
 
 		get_response text
 		send_vcard outlet
@@ -91,7 +91,7 @@ class ContactController < ApplicationController
 		outlet.outlet_contacts.each do |number|
 			contact_number.push number.phone_number
 		end
-		response_vcard outlet.name, contact_number
+		response_vcard outlet.name.gsub(',',''), contact_number
 	end
 
 	def wrong_query
