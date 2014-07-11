@@ -39,17 +39,16 @@ class ContactController < ApplicationController
 	end
 
 	def response_vcard first_name, contact_number
-		# if Rails.env.production?
+		if Rails.env.production?
 			params = {
 				'phone_number' => @customer.phone_number,
 				'token' => ENV['TOKEN'],
 				'first_name' => first_name,
 				'contact_number' => contact_number
 			}
-			puts ">>>>>>>#{params}"
 			url = URI.parse(ENV['API_VCARD_URL'])
 			response = Net::HTTP.post_form(url, params)
-		# end
+		end
 	end
 
 	def get_surburb text
@@ -67,20 +66,20 @@ class ContactController < ApplicationController
 			text = ENV['NO_OUTLET_MESSAGE'].gsub(/(?=\bwe\b)/, @customer.name+' ')+' '+place
 		end
 
-		response = get_response text
+		get_response text
 		if outlet
 			send_vcard
 		end
-		message = Message.create! :customer => @customer, :text => text
+		Message.create! :customer => @customer, :text => text
 	end
 
 	def return_surburb surburb
 		outlet = surburb.outlet
 		text = ENV['OUTLET_MESSAGE'].gsub(/(?=\bis\b)/, surburb.name+' ')+' '+outlet.name
 
-		response = get_response text
+		get_response text
 		send_vcard
-		message = Message.create! :customer=>@customer, :text=>text
+		Message.create! :customer=>@customer, :text=>text
 	end
 
 	def send_vcard
@@ -90,20 +89,22 @@ class ContactController < ApplicationController
 		outlet.outlet_contacts.each do |number|
 			contact_number.push number.phone_number
 		end
-		response = response_vcard outlet.name, contact_number
+		response_vcard outlet.name, contact_number
 	end
 
 	def wrong_query
 		text = ENV['NO_SURBURB_MESSAGE'].gsub(/(?=\bPlease\b)/, @customer.name+'. ')
-		response = get_response text
-		message = Message.create! :text => text, :customer => @customer
+		get_response text
+		Message.create! :text => text, :customer => @customer
 	end
 
 	def set_customer
 		@customer = Customer.find_by_name_and_phone_number(params[:name], params[:phone_number])
 		if @customer.nil?
 			@customer = Customer.create! phone_number: params[:phone_number], name: params[:name]
-			get_response ENV['WELCOME_MESSAGE']
+			text = ENV['WELCOME_MESSAGE'].gsub(/(?=\bThank\b)/, @customer.name+'. ')
+			get_response text
+			Message.create! :text=>text, :customer=>@customer
 		end
 		@customer
 	end

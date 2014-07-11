@@ -56,4 +56,10 @@ class ContactControllerTest < ActionController::TestCase
 		jogoo_rd = Surburb.find_by(name: "Jogoo Rd", approved: false)
 		assert_equal true, !jogoo_rd.nil?
 	end
+
+	test "Should send first time customer a welcome message" do
+		response = post :begin, { phone_number: "254716085380", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" }
+		message = Message.first
+		assert_equal message.text, "Hallo Rachael. Thank you for choosing Dial-a-Delivery"
+	end
 end

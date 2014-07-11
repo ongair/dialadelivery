@@ -11,10 +11,10 @@
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
-one:
-  text: MyString
-  customer_id: 
+# one:
+#   text: MyString
+#   customer_id: 
 
-two:
-  text: MyString
-  customer_id: 
+# two:
+#   text: MyString
+#   customer_id: 
