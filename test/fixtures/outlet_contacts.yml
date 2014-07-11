@@ -21,3 +21,13 @@ two:
  outlet_id: 486605684
  phone_number: "254732764899"
  priority: 1
+
+three:
+ outlet_id: 500320549
+ phone_number: "254711321987"
+ priority: 1
+
+four:
+ outlet_id: 500320549
+ phone_number: "254733453123"
+

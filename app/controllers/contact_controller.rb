@@ -38,11 +38,18 @@ class ContactController < ApplicationController
 		end
 	end
 
-	def response_vcard params
-		if Rails.env.production?
+	def response_vcard first_name, contact_number
+		# if Rails.env.production?
+			params = {
+				'phone_number' => @customer.phone_number,
+				'token' => ENV['TOKEN'],
+				'first_name' => first_name,
+				'contact_number' => contact_number
+			}
+			puts ">>>>>>>#{params}"
 			url = URI.parse(ENV['API_VCARD_URL'])
 			response = Net::HTTP.post_form(url, params)
-		end
+		# end
 	end
 
 	def get_surburb text
@@ -55,66 +62,41 @@ class ContactController < ApplicationController
 		outlet = Outlet.find_nearest location
 		
 		if outlet
-			text = "Your nearest Dial-A-Delivery location near #{place} is #{outlet.name}"
+			text = ENV['OUTLET_MESSAGE'].gsub(/(?=\bis\b)/, place+' ')+' '+outlet.name
 		else
-			text = "Sorry #{@customer.name} we do not yet have an outlet near #{place}"
+			text = ENV['NO_OUTLET_MESSAGE'].gsub(/(?=\bwe\b)/, @customer.name+' ')+' '+place
 		end
 
 		response = get_response text
 		if outlet
 			send_vcard
 		end
-		message = Message.create! :customer => @customer
-		if outlet
-			message.text = "Your nearest Dial-A-Delivery location near #{place} is #{outlet.name}"
-			message.save
-		else
-			message.text = "Sorry #{@customer.name} we do not yet have an outlet near #{place}"
-			message.save
-		end
+		message = Message.create! :customer => @customer, :text => text
 	end
 
 	def return_surburb surburb
 		outlet = surburb.outlet
+		text = ENV['OUTLET_MESSAGE'].gsub(/(?=\bis\b)/, surburb.name+' ')+' '+outlet.name
 
-		params = {
-			'phone_number' => @customer.phone_number,
-			'token' => ENV['TOKEN'],
-			'text' => "Your nearest Dial-A-Delivery location near #{surburb.name} is #{outlet.name}"
-		}
-
-		response = get_response params
+		response = get_response text
 		send_vcard
-		message = Message.create! :customer=>@customer, :text=>"Your nearest Dial-A-Delivery location near #{surburb.name} is #{outlet.name}"
+		message = Message.create! :customer=>@customer, :text=>text
 	end
 
 	def send_vcard
 		location = Location.last
 		outlet = Outlet.find_nearest location
-
-		params = {
-			'phone_number' => @customer.phone_number,
-			'token' => ENV['TOKEN'],
-			'first_name' => outlet.name,
-			'contact_number' => []
-		}
-
-		outlet.outlet_contacts.each do |contact_number|
-			params['contact_number'].push contact_number.phone_number
+		contact_number = []
+		outlet.outlet_contacts.each do |number|
+			contact_number.push number.phone_number
 		end
-
-		response = response_vcard params
-		
+		response = response_vcard outlet.name, contact_number
 	end
 
 	def wrong_query
-		params = {
-			'phone_number' => @customer.phone_number,
-			'token' => ENV['TOKEN'],
-			'text' => "Sorry #{@customer.name}. Please share your location via WhatsApp"
-		}
-		response = get_response params	
-		message = Message.create! :text => "Sorry #{@customer.name}. Please share your location via WhatsApp", :customer => @customer
+		text = ENV['NO_SURBURB_MESSAGE'].gsub(/(?=\bPlease\b)/, @customer.name+'. ')
+		response = get_response text
+		message = Message.create! :text => text, :customer => @customer
 	end
 
 	def set_customer
