@@ -25,8 +25,14 @@ class ContactController < ApplicationController
 	end
 
 	private
-	def get_response params
+	def get_response text
 		if Rails.env.production?
+			params = {
+				'phone_number' => @customer.phone_number,
+				'token' => ENV['TOKEN'],
+				'text' => text
+			}
+
 			url = URI.parse(ENV['API_URL'])
 			response = Net::HTTP.post_form(url, params)
 		end
@@ -47,20 +53,16 @@ class ContactController < ApplicationController
 		place = params[:address]
 		location = Location.create! :name => params[:address], :latitude => params[:latitude], :longitude => params[:longitude], :customer => @customer
 		outlet = Outlet.find_nearest location
-		params = {
-			'phone_number' => @customer.phone_number,
-			'token' => ENV['TOKEN']
-		}
-
+		
 		if outlet
-			params['text'] = "Your nearest Dial-A-Delivery location near #{place} is #{outlet.name}"
+			text = "Your nearest Dial-A-Delivery location near #{place} is #{outlet.name}"
 		else
-			params['text'] = "Sorry #{@customer.name} we do not yet have an outlet near #{place}"
+			text = "Sorry #{@customer.name} we do not yet have an outlet near #{place}"
 		end
 
-		response = get_response params
+		response = get_response text
 		if outlet
-			send_vcard params
+			send_vcard
 		end
 		message = Message.create! :customer => @customer
 		if outlet
@@ -82,17 +84,20 @@ class ContactController < ApplicationController
 		}
 
 		response = get_response params
-		send_vcard params
+		send_vcard
 		message = Message.create! :customer=>@customer, :text=>"Your nearest Dial-A-Delivery location near #{surburb.name} is #{outlet.name}"
 	end
 
-	def send_vcard params
-		params.delete('text')
-		params['first_name'] = "Dial-A-Delivery"
-		params['contact_number'] = []
-
+	def send_vcard
 		location = Location.last
 		outlet = Outlet.find_nearest location
+
+		params = {
+			'phone_number' => @customer.phone_number,
+			'token' => ENV['TOKEN'],
+			'first_name' => outlet.name,
+			'contact_number' => []
+		}
 
 		outlet.outlet_contacts.each do |contact_number|
 			params['contact_number'].push contact_number.phone_number
@@ -113,9 +118,10 @@ class ContactController < ApplicationController
 	end
 
 	def set_customer
-		@customer = Customer.find_by_phone_number(params[:phone_number])
+		@customer = Customer.find_by_name_and_phone_number(params[:name], params[:phone_number])
 		if @customer.nil?
 			@customer = Customer.create! phone_number: params[:phone_number], name: params[:name]
+			get_response ENV['WELCOME_MESSAGE']
 		end
 		@customer
 	end
