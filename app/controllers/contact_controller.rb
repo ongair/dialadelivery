@@ -43,9 +43,13 @@ class ContactController < ApplicationController
 			params = {
 				'phone_number' => @customer.phone_number,
 				'token' => ENV['TOKEN'],
-				'first_name' => first_name,
-				'contact_number' => contact_number
+				'first_name' => first_name
 			}
+			contact_number.each do |contact|
+				index = contact_number.index contact
+				params["contact_number[#{index}]"] = contact
+			end
+			puts ">>>>>>>>>>#{params}"
 			url = URI.parse(ENV['API_VCARD_URL'])
 			response = Net::HTTP.post_form(url, params)
 		end
