@@ -67,15 +67,19 @@ class WaiterController < ApplicationController
 		message = Message.create! :customer => @customer, :text => text
 	end
 
+	def cancel_order
+		cancel_order_text = "Your order has been cancelled."
+		get_response cancel_order_text
+		Message.create! :customer => @customer, :text => cancel_order_text
+	end
+
 	def process_text text
 		text.downcase!
-
 		step = @customer.orders.last
-
 		if text == 'cancel'
-			cancel_order_text = "Your order has been cancelled."
-			get_response cancel_order_text
-			Message.create! :customer => @customer, :text => cancel_order_text
+			cancel_order
+			step.order_step = "was_cancelled"
+			step.save
 		else
 			case step.order_step
 			when "sent_menu"
@@ -83,19 +87,60 @@ class WaiterController < ApplicationController
 					reply = "Your order details: "
 					if text =~ /\D/
 						reply = reply+text[0]+' '
+						@num_size = [text[0]]
 					else
 						reply = reply+'One '
+						@num_size = ['One']
 					end
-					reply+get_pizza_name text[1]+' '+get_pizza_size text[2]
+					size = get_pizza_size text[2]
+					reply+get_pizza_name text[1]+' '+size
+					@num_size.push size
 					
 					get_response reply
 					Message.create! :customer => @customer, :text => reply
+					@reply = reply.split(':')[-1]
 					
 					get_response "What free Pizza would you like to have?"
-					message = Message.create! :customer => @customer, :text => "What free Pizza would you like to have?"
+					Message.create! :customer => @customer, :text => "What free Pizza would you like to have?"
 
 					step.order_step = "asked_for_free_option"
 					step.save
+				else
+					wrong_main_order_format = "Sorry #{@customer.name}. Wrong format of reply. Please start with a number then order code, either A, B, C or D then the size either S for Small, M for Medium or L for Large"
+					get_response wrong_format
+					Message.create! customer: @customer, text: wrong_format
+				end
+
+			when "asked_for_free_option"
+				if is_a_pizza_code? text
+					main_order = "Your order details are as below, please confirm. Main Order:  "
+					main_order = main_order+@reply
+					main_order = main_order+". "+"Free Pizza: "+@num_size[0]+" "+get_pizza_name text[1]+" "+@num_size[1]
+					main_order = main_order+". Correct? (please reply with a yes or no)"
+
+					get_response main_order
+					Message.create! :customer => @customer, :text => main_order
+					step.order_type = "asked_for_confirmation"
+					step.save
+				else
+					wrong_free_pizza_format = "Sorry #{@customer.name}. Wrong format of reply. Please send either an A, B, C or D depending on the code of the pizza you want"
+					get_response wrong_free_pizza_format
+					Message.create customer: @customer, text: wrong_free_pizza_format
+				end
+
+			when "asked_for_confirmation"
+				if text == "yes"
+					final = "Thank you for ordering with Dial-a-Delivery, your pizza should be ready in 45 minutes, we hope you will be hungry by then."
+					get_response final
+					Message.create! customer: @customer, text: final
+				elsif text == "no"
+					cancel_order
+					step.order_step = "was_cancelled"
+					step.save
+				else
+					wrong_confirmation = "Sorry #{@customer.name}. Please send either yes or no to confirm or deny your order"
+					get_response wrong_confirmation
+					Message.create! customer: @customer, text: wrong_confirmation					
 				end
 			end
 		end
