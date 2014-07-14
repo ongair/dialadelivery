@@ -123,7 +123,10 @@ class WaiterController < ApplicationController
 
 			when "asked_for_free_option"
 				if is_a_pizza_code? text
-					main_order = get_main_order text, @reply, @num_size
+
+					pizza_price = get_pizza_price(@reply).to_i
+
+					main_order = get_main_order text, @reply, @num_size, pizza_price
 					get_response main_order
 					Message.create! :customer => @customer, :text => main_order
 					order.order_step = "asked_for_confirmation"
