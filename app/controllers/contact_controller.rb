@@ -49,7 +49,6 @@ class ContactController < ApplicationController
 				index = contact_number.index contact
 				params["contact_number[#{index}]"] = contact
 			end
-			puts ">>>>>>>>>>#{params}"
 			url = URI.parse(ENV['API_VCARD_URL'])
 			response = Net::HTTP.post_form(url, params)
 		end
