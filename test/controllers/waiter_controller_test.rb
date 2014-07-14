@@ -51,7 +51,7 @@ class WaiterControllerTest < ActionController::TestCase
 
     response = post :order, { phone_number: "254722200200", name: "Trevor", text: "yes", notification_type: "MessageReceived" }
     message = Message.last
-    assert_equal message.text, "Thank you for ordering with Dial-a-Delivery, your pizza should be ready in 45 minutes, we hope you will be hungry by then :)"
+    assert_equal message.text, "Thank you for ordering with Dial-a-Delivery, your pizza should be ready in 45 minutes, we hope you will be hungry by then."
   end
 
   test "Should handle wrong customer input during ordering" do
@@ -63,7 +63,7 @@ class WaiterControllerTest < ActionController::TestCase
 
     response = post :order, { phone_number: "254722200200", name: "Trevor", text: "x", notification_type: "MessageReceived" }
     message = Message.last
-    assert_equal message.text, "Sorry wrong choice. Enter A,B,C or D"
+    assert_equal message.text, "Sorry Trevor. Wrong format of reply. Please send either an A, B, C or D depending on the code of the pizza you want"
 
     response = post :order, { phone_number: "254722200200", name: "Trevor", text: "A", notification_type: "MessageReceived" }
     message = Message.last
@@ -71,7 +71,7 @@ class WaiterControllerTest < ActionController::TestCase
 
     response = post :order, { phone_number: "254722200200", name: "Trevor", text: "yes", notification_type: "MessageReceived" }
     message = Message.last
-    assert_equal message.text, "Thank you for ordering with Dial-a-Delivery, your pizza should be ready in 45 minutes, we hope you will be hungry by then :)"
+    assert_equal message.text, "Thank you for ordering with Dial-a-Delivery, your pizza should be ready in 45 minutes, we hope you will be hungry by then."
   end
 
   test "Should allow a customer to cancel an order at any time by sending the word cancel" do
@@ -83,7 +83,7 @@ class WaiterControllerTest < ActionController::TestCase
 
     response = post :order, { phone_number: "254722200200", name: "Trevor", text: "x", notification_type: "MessageReceived" }
     message = Message.last
-    assert_equal message.text, "Sorry wrong choice. Enter A,B,C or D"
+    assert_equal message.text, "Sorry Trevor. Wrong format of reply. Please send either an A, B, C or D depending on the code of the pizza you want"
 
     response = post :order, { phone_number: "254722200200", name: "Trevor", text: "Cancel", notification_type: "MessageReceived" }
     message = Message.last

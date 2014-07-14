@@ -43,7 +43,7 @@ class WaiterController < ApplicationController
 	end
 
 	def start_order
-		order = Order.create! customer_id: @customer.id order_step: "sent_menu"
+		order = Order.create! customer_id: @customer.id, order_step: "sent_menu"
 		reply order
 	end
 
@@ -76,6 +76,10 @@ class WaiterController < ApplicationController
 	def process_text text
 		text.downcase!
 		step = @customer.orders.last
+		if step.nil? || step.order_step == "was_cancelled"
+			Order.create! customer_id: @customer.id, order_step: "sent_menu"
+			step = @customer.orders.last
+		end
 		if text == 'cancel'
 			cancel_order
 			step.order_step = "was_cancelled"
@@ -93,12 +97,12 @@ class WaiterController < ApplicationController
 						@num_size = ['One']
 					end
 					size = get_pizza_size text[2]
-					reply+get_pizza_name text[1]+' '+size
+					reply = reply+get_pizza_name(text[1])+' '+size
 					@num_size.push size
 					
 					get_response reply
 					Message.create! :customer => @customer, :text => reply
-					@reply = reply.split(':')[-1]
+					@reply = reply.split(': ')[-1]
 					
 					get_response "What free Pizza would you like to have?"
 					Message.create! :customer => @customer, :text => "What free Pizza would you like to have?"
@@ -107,20 +111,20 @@ class WaiterController < ApplicationController
 					step.save
 				else
 					wrong_main_order_format = "Sorry #{@customer.name}. Wrong format of reply. Please start with a number then order code, either A, B, C or D then the size either S for Small, M for Medium or L for Large"
-					get_response wrong_format
-					Message.create! customer: @customer, text: wrong_format
+					get_response wrong_main_order_format
+					Message.create! customer: @customer, text: wrong_main_order_format
 				end
 
 			when "asked_for_free_option"
 				if is_a_pizza_code? text
-					main_order = "Your order details are as below, please confirm. Main Order:  "
+					main_order = "Your order details are as below, please confirm. Main Order: "
 					main_order = main_order+@reply
-					main_order = main_order+". "+"Free Pizza: "+@num_size[0]+" "+get_pizza_name text[1]+" "+@num_size[1]
+					main_order = main_order+". "+"Free Pizza: "+@num_size[0]+" "+get_pizza_name(text)+" "+@num_size[1]
 					main_order = main_order+". Correct? (please reply with a yes or no)"
 
 					get_response main_order
 					Message.create! :customer => @customer, :text => main_order
-					step.order_type = "asked_for_confirmation"
+					step.order_step = "asked_for_confirmation"
 					step.save
 				else
 					wrong_free_pizza_format = "Sorry #{@customer.name}. Wrong format of reply. Please send either an A, B, C or D depending on the code of the pizza you want"

@@ -21,7 +21,7 @@ hawaiian:
   large_price: 1000
   code: C
 
- meat_deluxe:
+meat_deluxe:
   name: Meat Deluxe
   medium_price: 800
   small_price: 600
