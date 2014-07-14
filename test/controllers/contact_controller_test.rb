@@ -9,16 +9,6 @@ class ContactControllerTest < ActionController::TestCase
 	 	assert !@customer.nil? 
 	 end
 
-	# test "Should send message to customer after receipt of pass phrase which should be case insensitive" do
-	# 	response = post :begin, { phone_number: "254716085380", name: "Trevor", text: "Dial-a-delivery", notification_type: "MessageReceived" }
-		
-	# 	# assert_equal response.code, "200"
-	# 	@message = Message.last
-
-	# 	assert_equal @message.customer.phone_number, "254716085380"
-	# 	assert_equal @message.text, "Hi Trevor! Thank you for choosing Dial-A-Delivery. Please share your location using WhatsApp to get the contacts of your nearest outlet"
-	# end
-
 	test "Should send sorry wrong query message to customer after receipt of not pass phrase" do
 		response = post :begin, { phone_number: "254716085380", name: "Rachael", text: "Dial", notification_type: "MessageReceived" }
 		
@@ -26,7 +16,7 @@ class ContactControllerTest < ActionController::TestCase
 		@message = Message.last
 
 		assert_equal @message.customer.phone_number, "254716085380"
-		assert_equal @message.text, "Sorry Rachael. Please send a valid location name for delivery to where you are"
+		assert_equal @message.text, "Sorry Rachael. Please share your location via WhatsApp"
 	end
 
 	test "It should return the closest outlet when a user sends their location" do
@@ -55,5 +45,21 @@ class ContactControllerTest < ActionController::TestCase
 
 		@message = Message.last
 		assert_equal @message.text, "Your nearest Dial-A-Delivery location near ihub is #{outlets(:ngong_road).name}"
+	end
+
+	test "It should save an unknown location from text to an unapproved suburb" do
+		response = post :begin, { phone_number: "254716085380", text: "Jogoo Rd", name: "Rachael", notification_type: "MessageReceived" }
+	
+		# @message = Message.last
+		# assert_equal @message.text, "Sorry Rachael. Please send a valid location name for delivery to where you are"
+
+		jogoo_rd = Surburb.find_by(name: "Jogoo Rd", approved: false)
+		assert_equal true, !jogoo_rd.nil?
+	end
+
+	test "Should send first time customer a welcome message" do
+		response = post :begin, { phone_number: "254716085380", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" }
+		message = Message.first
+		assert_equal message.text, "Hallo Rachael. Thank you for choosing Dial-a-Delivery"
 	end
 end
