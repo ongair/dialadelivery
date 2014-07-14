@@ -7,6 +7,7 @@
 #  outlet_id  :integer
 #  created_at :datetime
 #  updated_at :datetime
+#  approved   :boolean
 #
 
 class Surburb < ActiveRecord::Base

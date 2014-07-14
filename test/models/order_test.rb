@@ -9,6 +9,7 @@
 #  status      :string(255)
 #  created_at  :datetime
 #  updated_at  :datetime
+#  order_step  :string(255)
 #
 
 require 'test_helper'
