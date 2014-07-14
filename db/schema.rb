@@ -110,6 +110,7 @@ ActiveRecord::Schema.define(version: 20140710132155) do
     t.integer  "outlet_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "approved"
   end
 
   add_index "surburbs", ["outlet_id"], name: "index_surburbs_on_outlet_id"
