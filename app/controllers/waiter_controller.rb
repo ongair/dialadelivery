@@ -56,9 +56,9 @@ class WaiterController < ApplicationController
 		location = Location.find_or_create_by! :name => params[:address], :latitude => params[:latitude], :longitude => params[:longitude], :customer => @customer
 		outlet = Outlet.find_nearest location
 		if outlet
-			text = "Your order for #{place} will be sent to #{outlet.name}"
+			text = get_outlet_text_for_order_location place, outlet.name
 		else
-			text = "Sorry #{@customer.name} we do not yet have an outlet near #{place}"
+			text = get_outlet_text_for_no_order_location place, @customer.name
 		end
 		response = get_response text
 		if outlet
@@ -73,19 +73,24 @@ class WaiterController < ApplicationController
 		Message.create! :customer => @customer, :text => cancel_order_text
 	end
 
+	def set_order
+		order = @customer.orders.last
+		if order.nil? || order.order_step == "was_cancelled"
+			Order.create! customer_id: @customer.id, order_step: "sent_menu"
+			order = @customer.orders.last
+		end
+		order
+	end
+
 	def process_text text
 		text.downcase!
-		step = @customer.orders.last
-		if step.nil? || step.order_step == "was_cancelled"
-			Order.create! customer_id: @customer.id, order_step: "sent_menu"
-			step = @customer.orders.last
-		end
+		order = set_order
 		if text == 'cancel'
 			cancel_order
-			step.order_step = "was_cancelled"
-			step.save
+			order.order_step = "was_cancelled"
+			order.save
 		else
-			case step.order_step
+			case order.order_step
 			when "sent_menu"
 				if is_a_main_order?(text)
 					reply = "Your order details: "
@@ -104,45 +109,44 @@ class WaiterController < ApplicationController
 					Message.create! :customer => @customer, :text => reply
 					@reply = reply.split(': ')[-1]
 					
-					get_response "What free Pizza would you like to have?"
-					Message.create! :customer => @customer, :text => "What free Pizza would you like to have?"
+					order_question = get_order_question "free_pizza"
+					get_response order_question
+					Message.create! :customer => @customer, :text => order_question
 
-					step.order_step = "asked_for_free_option"
-					step.save
+					order.order_step = "asked_for_free_option"
+					order.save
 				else
-					wrong_main_order_format = "Sorry #{@customer.name}. Wrong format of reply. Please start with a number then order code, either A, B, C or D then the size either S for Small, M for Medium or L for Large"
+					wrong_main_order_format = get_wrong_main_order_format @customer.name
 					get_response wrong_main_order_format
 					Message.create! customer: @customer, text: wrong_main_order_format
 				end
 
 			when "asked_for_free_option"
 				if is_a_pizza_code? text
-					main_order = "Your order details are as below, please confirm. Main Order: "
-					main_order = main_order+@reply
-					main_order = main_order+". "+"Free Pizza: "+@num_size[0]+" "+get_pizza_name(text)+" "+@num_size[1]
-					main_order = main_order+". Correct? (please reply with a yes or no)"
-
+					main_order = get_main_order text, @reply, @num_size
 					get_response main_order
 					Message.create! :customer => @customer, :text => main_order
-					step.order_step = "asked_for_confirmation"
-					step.save
+					order.order_step = "asked_for_confirmation"
+					order.save
 				else
-					wrong_free_pizza_format = "Sorry #{@customer.name}. Wrong format of reply. Please send either an A, B, C or D depending on the code of the pizza you want"
+					wrong_free_pizza_format = get_wrong_free_pizza_format @customer.name
 					get_response wrong_free_pizza_format
 					Message.create customer: @customer, text: wrong_free_pizza_format
 				end
 
 			when "asked_for_confirmation"
 				if text == "yes"
-					final = "Thank you for ordering with Dial-a-Delivery, your pizza should be ready in 45 minutes, we hope you will be hungry by then."
+					final = get_order_question "order_complete"
 					get_response final
 					Message.create! customer: @customer, text: final
+					order.order_step = "order_completed"
+					order.save
 				elsif text == "no"
 					cancel_order
-					step.order_step = "was_cancelled"
-					step.save
+					order.order_step = "was_cancelled"
+					order.save
 				else
-					wrong_confirmation = "Sorry #{@customer.name}. Please send either yes or no to confirm or deny your order"
+					wrong_confirmation = get_wrong_boolean_format @customer.name
 					get_response wrong_confirmation
 					Message.create! customer: @customer, text: wrong_confirmation					
 				end
