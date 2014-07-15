@@ -41,9 +41,9 @@ class ApplicationController < ActionController::Base
   	end
   	pizza = Pizza.where(Pizza.arel_table[:name].matches(reply[1])).take
   	if reply[0] != "One"
-  		pizza_price = pizza.get_price(reply[2]) * reply[0].to_i
+  		pizza_price = pizza.get_price(reply[-1]) * reply[0].to_i
   	else
-  		pizza_price = pizza.get_price(reply[2])
+  		pizza_price = pizza.get_price(reply[-1])
   	end
 
   end

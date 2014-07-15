@@ -94,8 +94,8 @@ class WaiterController < ApplicationController
 						reply = reply+'One '
 						@num_size = ['One']
 					end
-					size = get_pizza_size text[2]
-					reply = reply+get_pizza_name(text[1])+' '+size
+					size = get_pizza_size text[-1]
+					reply = reply+get_pizza_name(text[-2])+' '+size
 					@num_size.push size
 					
 					get_response reply
