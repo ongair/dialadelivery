@@ -53,7 +53,7 @@ class WaiterController < ApplicationController
 		end
 		response = get_response text
 		if outlet
-			path = File.dirname(__FILE__)+'/../assets/images/menu.jpg'
+			path = Rails.root + 'app/assets/images/menu.jpg'
 			img = File.new(path)
 			get_image_response img
 		end
