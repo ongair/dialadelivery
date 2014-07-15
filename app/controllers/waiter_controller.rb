@@ -28,7 +28,7 @@ class WaiterController < ApplicationController
 
 	def get_image_response img
 		url = URI.parse(ENV['API_IMAGE_URL'])
-		image_response = HTTParty.post(url, body: { token: ENV['TOKEN'],  phone_number: @customer.phone_number, image: img, thread: true }, debug_output: $stdout)
+		image_response = HTTMultiParty.post(url, body: { token: ENV['TOKEN'],  phone_number: @customer.phone_number, image: img, thread: true }, debug_output: $stdout)
 	end
 
 	def start_order
@@ -37,7 +37,7 @@ class WaiterController < ApplicationController
 	end
 
 	def reply order
-		path = File.dirname(__FILE__)+'/../assets/images/steps.jpg'
+		path = Rails.root + 'app/assets/images/steps.jpg'
 		img = File.new(path)
 		get_image_response img
 	end

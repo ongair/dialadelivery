@@ -1,0 +1,9 @@
+START: PIZZA
+SIZE_MEDIUM: M
+SIZE_SMALL: S
+SIZE_LARGE: L
+API_URL: http://localhost:3000/api/v1/base/send
+API_IMAGE_URL: http://localhost:3000/api/v1/base/send_image
+API_VCARD_URL: http://localhost:3000/api/v1/base/send_contact
+TOKEN: 07a19a8b8ff38d9d8b3613901a9a61e9
+BEGIN: Pizza
