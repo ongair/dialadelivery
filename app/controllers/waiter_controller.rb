@@ -21,7 +21,7 @@ class WaiterController < ApplicationController
 	def get_response text
 		if Rails.env.production?
 			url = URI.parse(ENV['API_URL'])
-			response = HTTParty.post(url, body: { token: ENV['TOKEN'],  phone_number: @customer.phone_number, text: text}, debug_output: $stdout)
+			response = HTTParty.post(url, body: { token: ENV['TOKEN'],  phone_number: @customer.phone_number, text: text, thread: true}, debug_output: $stdout)
 
 		end
 	end
