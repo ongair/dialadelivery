@@ -14,9 +14,9 @@
 
 class Pizza < ActiveRecord::Base
 	def get_price size
-		if size.downcase == 'small'
+		if size.downcase == ENV['SIZE_SMALL'].downcase
 			return small_price
-		elsif size.downcase == 'medium'
+		elsif size.downcase == ENV['SIZE_MEDIUM'].downcase
 			return medium_price
 		else
 			return large_price
