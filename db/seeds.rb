@@ -16,6 +16,7 @@
 # 	o.delete
 # end
 
+<<<<<<< HEAD
 ngongroad = Outlet.find_or_create_by_name! name: "Pizza Inn, Ngong Road", latitude: -1.299965, longitude: 36.789738
 # junction = Outlet.find_or_create_by_name! name: "Pizza Inn Junction", latitude: -1.298225, longitude: 36.762011
 buruburu = Outlet.find_or_create_by_name! name: "Pizza Inn-Buruburu", latitude: -1.29515, longitude: 36.876854
@@ -36,17 +37,22 @@ kitengela = Outlet.find_or_create_by_name! name: "Pizza Inn-Kitengela", latitude
 nyali = Outlet.find_or_create_by_name! name: "Pizza Inn-City Mall, Nyali Road", latitude: -4.019644, longitude: 39.720836
 likoni = Outlet.find_or_create_by_name! name: "Pizza Inn Likoni", latitude: -4.091367, longitude: 39.649263
 bellevue = Outlet.find_or_create_by_name! name: "Pizza Inn-Bellevue, Nairobi, Kenya", latitude: -1.319342, longitude: 36.836865
+=======
+# Outlet.find_or_create_by_name! name: "Pizza Inn Ngong Road", latitude: -1.299965, longitude: 36.789738
+# Outlet.find_or_create_by_name! name: "Pizza Inn Junction", latitude: -1.298225, longitude: 36.762011
+>>>>>>> order
 
-outlet1 = Outlet.all[0].id
-outlet2 = Outlet.all[1].id
+# outlet1 = Outlet.all[0].id
+# outlet2 = Outlet.all[1].id
 
-Surburb.find_or_create_by_name_and_outlet_id! :outlet_id=>outlet1, :name=>"Ihub"
-Surburb.find_or_create_by_name_and_outlet_id! :outlet_id=>outlet2, :name=>"Jamuhuri"
+# Surburb.find_or_create_by_name_and_outlet_id! :outlet_id=>outlet1, :name=>"Ihub"
+# Surburb.find_or_create_by_name_and_outlet_id! :outlet_id=>outlet2, :name=>"Jamuhuri"
 
 
 
 # OutletContact.find_or_create_by_phone_number_and_outlet_id! outlet_id: outlet1, phone_number: "254722946639"
 # #OutletContact.find_or_create_by_phone_number_and_outlet_id! outlet_id: outlet1, phone_number: "254712345635"
+<<<<<<< HEAD
 
 # OutletContact.find_or_create_by_phone_number_and_outlet_id! outlet_id: outlet2, phone_number: "254722784921"
 OutletContact.find_or_create_by_phone_number_and_outlet_id! outlet_id: buruburu.id, phone_number: "0738001381"
@@ -102,3 +108,8 @@ OutletContact.find_or_create_by_phone_number_and_outlet_id! outlet_id: thikaroad
  OutletContact.find_or_create_by_phone_number_and_outlet_id! outlet_id: rongai.id, phone_number: "0775555091"
 
 
+=======
+
+# OutletContact.find_or_create_by_phone_number_and_outlet_id! outlet_id: outlet2, phone_number: "254722784921"
+# #OutletContact.find_or_create_by_phone_number_and_outlet_id! outlet_id: outlet2, phone_number: "254722784921"
+>>>>>>> order

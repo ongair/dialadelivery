@@ -19,4 +19,25 @@ hawaiian:
   medium_price: 800
   small_price: 600
   large_price: 1000
+  code: C
+
+meat_deluxe:
+  name: Meat Deluxe
+  medium_price: 800
+  small_price: 600
+  large_price: 1000
   code: A
+
+four_seasons:
+  name: Four Seasons
+  medium_price: 800
+  small_price: 600
+  large_price: 1000
+  code: B
+
+periperi:
+  name: Peri-Peri Chicken
+  medium_price: 800
+  small_price: 600
+  large_price: 1000
+  code: D
