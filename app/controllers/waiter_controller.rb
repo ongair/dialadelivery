@@ -20,25 +20,27 @@ class WaiterController < ApplicationController
 
 	def get_response text
 		if Rails.env.production?
-			params = {
-				'phone_number' => @customer.phone_number,
-				'token' => ENV['TOKEN'],
-				'text' => text
-			}
+			# params = {
+			# 	'phone_number' => @customer.phone_number,
+			# 	'token' => ENV['TOKEN'],
+			# 	'text' => text
+			# }
 			url = URI.parse(ENV['API_URL'])
-			response = Net::HTTP.post_form(url, params)
+			# response = Net::HTTP.post_form(url, params)
+			response = HTTParty.post(url, body: { token: ENV['TOKEN'],  phone_number: @customer.phone_number, text: text}, debug_output: $stdout)
+
 		end
 	end
 
 	def get_image_response img
-		params = {
-			'phone_number' => @customer.phone_number,
-			'token' => ENV['TOKEN'],
-			'image' => img
-		}
+		# params = {
+		# 	'phone_number' => @customer.phone_number,
+		# 	'token' => ENV['TOKEN'],
+		# 	'image' => img
+		# }
 		url = URI.parse(ENV['API_IMAGE_URL'])
-		response = Net::HTTP.post_form(url, params)
-		# image_response = HTTParty.post(url, body: { token: ENV['TOKEN'],  phone_number: @customer.phone_number, image: img, thread: true }, debug_output: $stdout)
+		# response = Net::HTTP.post_form(url, params)
+		image_response = HTTParty.post(url, body: { token: ENV['TOKEN'],  phone_number: @customer.phone_number, image: img, thread: true }, debug_output: $stdout)
 	end
 
 	def start_order
@@ -48,7 +50,7 @@ class WaiterController < ApplicationController
 
 	def reply order
 		path = File.dirname(__FILE__)+'/../assets/images/steps.jpg'
-		img = File.new(path).read
+		img = File.new(path)
 		get_image_response img
 	end
 
@@ -64,7 +66,7 @@ class WaiterController < ApplicationController
 		response = get_response text
 		if outlet
 			path = File.dirname(__FILE__)+'/../assets/images/menu.jpg'
-			img = File.new(path).read
+			img = File.new(path)
 			get_image_response img
 		end
 		message = Message.create! :customer => @customer, :text => text
