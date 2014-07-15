@@ -20,26 +20,14 @@ class WaiterController < ApplicationController
 
 	def get_response text
 		if Rails.env.production?
-			# params = {
-			# 	'phone_number' => @customer.phone_number,
-			# 	'token' => ENV['TOKEN'],
-			# 	'text' => text
-			# }
 			url = URI.parse(ENV['API_URL'])
-			# response = Net::HTTP.post_form(url, params)
 			response = HTTParty.post(url, body: { token: ENV['TOKEN'],  phone_number: @customer.phone_number, text: text}, debug_output: $stdout)
 
 		end
 	end
 
 	def get_image_response img
-		# params = {
-		# 	'phone_number' => @customer.phone_number,
-		# 	'token' => ENV['TOKEN'],
-		# 	'image' => img
-		# }
 		url = URI.parse(ENV['API_IMAGE_URL'])
-		# response = Net::HTTP.post_form(url, params)
 		image_response = HTTParty.post(url, body: { token: ENV['TOKEN'],  phone_number: @customer.phone_number, image: img, thread: true }, debug_output: $stdout)
 	end
 
@@ -72,7 +60,7 @@ class WaiterController < ApplicationController
 		message = Message.create! :customer => @customer, :text => text
 	end
 
-	def cancel_order
+	def send_cancel_order_text
 		cancel_order_text = "Your order has been cancelled."
 		get_response cancel_order_text
 		Message.create! :customer => @customer, :text => cancel_order_text
@@ -80,23 +68,23 @@ class WaiterController < ApplicationController
 
 	def set_order
 		order = @customer.orders.last
-		if order.nil? || order.order_step == "was_cancelled"
-			Order.create! customer_id: @customer.id, order_step: "sent_menu"
-			order = @customer.orders.last
-		end
-		order
+		# if order.nil? || order.order_step == "was_cancelled"
+		# 	Order.create! customer_id: @customer.id, order_step: "sent_menu"
+		# 	order = @customer.orders.last
+		# end
+		# order
 	end
 
 	def process_text text
 		text.downcase!
 		order = set_order
 		if text == 'cancel'
-			cancel_order
+			send_cancel_order_text
 			order.order_step = "was_cancelled"
 			order.save
 		else
 			case order.order_step
-			when "sent_menu"
+			when "sent_menu", "was_cancelled"
 				if is_a_main_order?(text)
 					reply = "Your order details: "
 					if text =~ /\D/
@@ -158,6 +146,8 @@ class WaiterController < ApplicationController
 					get_response wrong_confirmation
 					Message.create! customer: @customer, text: wrong_confirmation					
 				end
+			# when "was_cancelled"
+			# 	start_order
 			end
 		end
 	end

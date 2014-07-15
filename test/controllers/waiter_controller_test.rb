@@ -39,6 +39,8 @@ class WaiterControllerTest < ActionController::TestCase
   end
 
   test "Should return customer's main order details and ask what free pizza they want" do
+    post :order, { phone_number: "254722200200", name: "Trevor", text: "PIZZA", notification_type: "MessageReceived" }
+
     response = post :order, { phone_number: "254722200200", name: "Trevor", text: "5BL", notification_type: "MessageReceived" }
     message = Message.all[-2]
     assert_equal message.text, "Your order details: 5 Four Seasons Large"
@@ -55,6 +57,8 @@ class WaiterControllerTest < ActionController::TestCase
   end
 
   test "Should handle wrong customer input during ordering" do
+    post :order, { phone_number: "254722200200", name: "Trevor", text: "PIZZA", notification_type: "MessageReceived" }
+
     response = post :order, { phone_number: "254722200200", name: "Trevor", text: "5bl", notification_type: "MessageReceived" }
     message = Message.all[-2]
     assert_equal message.text, "Your order details: 5 Four Seasons Large"
@@ -75,6 +79,8 @@ class WaiterControllerTest < ActionController::TestCase
   end
 
   test "Should allow a customer to cancel an order at any time by sending the word cancel" do
+    post :order, { phone_number: "254722200200", name: "Trevor", text: "PIZZA", notification_type: "MessageReceived" }
+
     response = post :order, { phone_number: "254722200200", name: "Trevor", text: "5bl", notification_type: "MessageReceived" }
     message = Message.all[-2]
     assert_equal message.text, "Your order details: 5 Four Seasons Large"
