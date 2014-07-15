@@ -18,13 +18,13 @@ class WaiterControllerTest < ActionController::TestCase
   end
 
   test "Should send the intoductory image after receipt of PIZZA" do
-    response = post :order, { phone_number: "254723140111", name: "Percila", text: "PIZZA", notification_type: "MessageReceived" }
+    response = post :order, { phone_number: "254716085380", name: "Rachael", text: "PIZZA", notification_type: "MessageReceived" }
 
     assert_equal response.code, "200"
   end
 
   test "It should return the closest outlet when a user sends their location if outlet exists" do
-    response = post :order, { phone_number: "254723140111", address: "Ngong road", name: "Rachael", notification_type: "LocationReceived", latitude: outlets(:ngong_road).latitude, longitude: outlets(:ngong_road).longitude }
+    response = post :order, { phone_number: "254716085380", address: "Ngong road", name: "Rachael", notification_type: "LocationReceived", latitude: outlets(:ngong_road).latitude, longitude: outlets(:ngong_road).longitude }
     assert_equal response.code, "200"
 
     message = Message.last
