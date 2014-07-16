@@ -127,5 +127,37 @@ class WaiterControllerTest < ActionController::TestCase
     assert_equal @message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}"
   end
 
+  test "whole process with Surburb text" do
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "PIZZA", notification_type: "MessageReceived" }
+    assert_equal response.code, "200"
 
+    response = post :order, { phone_number: "254716085380", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" } 
+    @message = Message.last
+    assert_equal @message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}"
+    assert_equal response.code, "200"
+
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "5bm", notification_type: "MessageReceived" }
+    message = Message.all[-2]
+    assert_equal message.text, "Your order details: 5 Four Seasons Medium"
+    message = Message.last
+    assert_equal message.text, "What free Pizza would you like to have?"
+
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "x", notification_type: "MessageReceived" }
+    message = Message.last
+    assert_equal message.text, "Sorry Trevor. Wrong format of reply. Please send either an A, B, C or D depending on the code of the pizza you want"
+
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "Cancel", notification_type: "MessageReceived" }
+    message = Message.last
+    assert_equal message.text, "Your order has been cancelled."
+
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "bl", notification_type: "MessageReceived" }
+    message = Message.all[-2]
+    assert_equal message.text, "Your order details: One Four Seasons Large"
+    message = Message.last
+    assert_equal message.text, "What free Pizza would you like to have?"
+
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "A", notification_type: "MessageReceived" }
+    message = Message.last
+    assert_equal message.text, "Your order details are as below, please confirm. Main Order: One Four Seasons Large. Free Pizza: One Meat Deluxe Large at KES 1000. Correct? (please reply with a yes or no)"
+  end
 end

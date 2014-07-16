@@ -117,10 +117,11 @@ class WaiterController < ApplicationController
 					puts ">>>>>>>>>#{@num_size}"
 					
 					get_response reply
+					@reply = reply.split(': ')[-1]
 					order.order_step = "asked_for_free_option"
 					order.save
 					Message.create! :customer => @customer, :text => reply
-					@reply = reply.split(': ')[-1]
+					
 					
 					order_question = get_order_question "free_pizza"
 					get_response order_question
