@@ -16,5 +16,16 @@ require 'test_helper'
 
 class OrderTest < ActiveSupport::TestCase
     
+  test "Should get the correct number of pizzas" do  	
+  	str = "2BL"
+  	result = Order.get_order str
+
+  	assert_equals "2 Four Seasons Large"
+
+  	str = "BL"
+  	result = Order.get_order str
+
+  	assert_equals "One Four Seasons Large"
+  end
 
 end

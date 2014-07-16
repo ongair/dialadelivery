@@ -19,4 +19,7 @@ class Order < ActiveRecord::Base
   has_many :order_items
 
   scope :pending, -> { where(status: "PENDING" ) }
+
+  def self.get_order string
+  end
 end
