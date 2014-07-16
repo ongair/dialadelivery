@@ -27,8 +27,7 @@ class WaiterController < ApplicationController
 					Message.create! :text => text, :customer => @customer
 				end
 			else
-				
-				process_text params[:text], order
+				process_text params[:text]
 			end
 		elsif params[:notification_type]=="LocationReceived"
 			return_location
@@ -175,25 +174,27 @@ class WaiterController < ApplicationController
 					get_response wrong_confirmation
 					Message.create! customer: @customer, text: wrong_confirmation					
 				end
-			# when "was_cancelled"
-			# 	start_order
+			when "order_completed"
+				text = "Please send the word Pizza to start another order"
+				get_response text
+				Message.create! customer: @customer, text: text
+			end
 		end
 	end
-end
 
-def is_start_word? text
-	text.downcase == ENV['START'].downcase
-end
-
-def has_pending_orders?
-	!@customer.orders.pending.empty?
-end
-
-def set_customer
-	@customer = Customer.find_by_phone_number(params[:phone_number])
-	if @customer.nil?
-		@customer = Customer.create! phone_number: params[:phone_number], name: params[:name]
+	def is_start_word? text
+		text.downcase == ENV['START'].downcase
 	end
-	@customer
-end
+
+	def has_pending_orders?
+		!@customer.orders.pending.empty?
+	end
+
+	def set_customer
+		@customer = Customer.find_by_phone_number(params[:phone_number])
+		if @customer.nil?
+			@customer = Customer.create! phone_number: params[:phone_number], name: params[:name]
+		end
+		@customer
+	end
 end
