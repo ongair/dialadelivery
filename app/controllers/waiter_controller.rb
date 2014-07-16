@@ -87,16 +87,17 @@ class WaiterController < ApplicationController
 			when "sent_menu", "was_cancelled"
 				if is_a_main_order?(text)
 					reply = "Your order details: "
-					if text =~ /\D/
+					if text[/\d/]
 						reply = reply+text[0]+' '
 						@num_size = [text[0]]
 					else
 						reply = reply+'One '
 						@num_size = ['One']
 					end
-					size = get_pizza_size text[-1]
+					size = get_pizza_size(text[-1])
 					reply = reply+get_pizza_name(text[-2])+' '+size
 					@num_size.push size
+					puts ">>>>>>>>>#{@num_size}"
 					
 					get_response reply
 					order.order_step = "asked_for_free_option"
@@ -116,7 +117,7 @@ class WaiterController < ApplicationController
 			when "asked_for_free_option"
 				if is_a_pizza_code? text
 
-					pizza_price = get_pizza_price(@reply).to_i
+					pizza_price = get_pizza_price(@reply)
 
 					main_order = get_main_order text, @reply, @num_size, pizza_price
 					get_response main_order
