@@ -85,6 +85,5 @@ class ApplicationController < ActionController::Base
 
   def wrong_query
     text = ENV['NO_SURBURB_MESSAGE'].gsub(/(?=\bPlease\b)/, @customer.name+'. ')
-    
   end
 end
