@@ -77,9 +77,9 @@ class WaiterControllerTest < ActionController::TestCase
   test "Should handle wrong customer input during ordering" do
     post :order, { phone_number: "254722200200", name: "Trevor", text: "PIZZA", notification_type: "MessageReceived" }
 
-    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "5bl", notification_type: "MessageReceived" }
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "5Cs", notification_type: "MessageReceived" }
     message = Message.all[-2]
-    assert_equal message.text, "Your order details: 5 Four Seasons Large"
+    assert_equal message.text, "Your order details: 5 Hawaiian Small"
     message = Message.last
     assert_equal message.text, "What free Pizza would you like to have?"
 
@@ -89,7 +89,7 @@ class WaiterControllerTest < ActionController::TestCase
 
     response = post :order, { phone_number: "254722200200", name: "Trevor", text: "A", notification_type: "MessageReceived" }
     message = Message.last
-    assert_equal message.text, "Your order details are as below, please confirm. Main Order: 5 Four Seasons Large. Free Pizza: 5 Meat Deluxe Large at KES 5000. Correct? (please reply with a yes or no)"
+    assert_equal message.text, "Your order details are as below, please confirm. Main Order: 5 Hawaiian Small. Free Pizza: 5 Meat Deluxe Small at KES 3000. Correct? (please reply with a yes or no)"
 
     response = post :order, { phone_number: "254722200200", name: "Trevor", text: "yes", notification_type: "MessageReceived" }
     message = Message.last
@@ -99,9 +99,9 @@ class WaiterControllerTest < ActionController::TestCase
   test "Should allow a customer to cancel an order at any time by sending the word cancel" do
     post :order, { phone_number: "254722200200", name: "Trevor", text: "PIZZA", notification_type: "MessageReceived" }
 
-    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "5bl", notification_type: "MessageReceived" }
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "5bm", notification_type: "MessageReceived" }
     message = Message.all[-2]
-    assert_equal message.text, "Your order details: 5 Four Seasons Large"
+    assert_equal message.text, "Your order details: 5 Four Seasons Medium"
     message = Message.last
     assert_equal message.text, "What free Pizza would you like to have?"
 
@@ -119,4 +119,13 @@ class WaiterControllerTest < ActionController::TestCase
     message = Message.last
     assert_equal message.text, "What free Pizza would you like to have?"
   end
+
+  test "It should detect a location from the text received if a user sends in the location as a word" do
+    response = post :order, { phone_number: "254716085380", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" } 
+
+    @message = Message.last
+    assert_equal @message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}"
+  end
+
+
 end

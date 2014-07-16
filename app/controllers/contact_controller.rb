@@ -12,7 +12,10 @@ class ContactController < ApplicationController
 			surburb = get_surburb params[:text]
 			if surburb
 				if surburb.approved
-					return_surburb surburb
+					outlet, text = return_surburb_text surburb
+					get_response text
+					send_vcard outlet
+					Message.create! :customer=>@customer, :text=>text
 				else
 					wrong_query
 				end
@@ -54,10 +57,6 @@ class ContactController < ApplicationController
 		end
 	end
 
-	def get_surburb text
-		surburb = Surburb.where(Surburb.arel_table[:name].matches(text)).take
-	end
-
 	def return_location
 		place = params[:address]
 		location = Location.create! :name => params[:address], :latitude => params[:latitude], :longitude => params[:longitude], :customer => @customer
@@ -76,14 +75,7 @@ class ContactController < ApplicationController
 		Message.create! :customer => @customer, :text => text
 	end
 
-	def return_surburb surburb
-		outlet = surburb.outlet
-		text = ENV['OUTLET_MESSAGE'].gsub(/(?=\bis\b)/, surburb.name+' ')+' '+outlet.name.gsub(',','')
-
-		get_response text
-		send_vcard outlet
-		Message.create! :customer=>@customer, :text=>text
-	end
+	
 
 	def send_vcard outlet
 		contact_number = []

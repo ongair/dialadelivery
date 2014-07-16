@@ -5,8 +5,21 @@ class WaiterController < ApplicationController
 
 	def order
 		if params[:notification_type]=="MessageReceived"
+			surburb = get_surburb params[:text]
 			if is_start_word? params[:text]
 				start_order
+			elsif surburb
+				if surburb.approved
+					outlet, text = return_surburb_text surburb
+					if outlet
+						text = get_outlet_text_for_order_location surburb.name, outlet.name
+					else
+						text = get_outlet_text_for_no_order_location surburb.name, @customer.name
+					end
+					get_response text
+					send_menu
+					Message.create! :customer=>@customer, :text=>text
+				end
 			else
 				process_text params[:text]
 			end
@@ -42,6 +55,12 @@ class WaiterController < ApplicationController
 		get_image_response img
 	end
 
+	def send_menu
+		path = Rails.root + 'app/assets/images/menu.jpg'
+		img = File.new(path)
+		get_image_response img
+	end
+
 	def return_location
 		place = params[:address]
 		location = Location.find_or_create_by! :name => params[:address], :latitude => params[:latitude], :longitude => params[:longitude], :customer => @customer
@@ -53,9 +72,7 @@ class WaiterController < ApplicationController
 		end
 		response = get_response text
 		if outlet
-			path = Rails.root + 'app/assets/images/menu.jpg'
-			img = File.new(path)
-			get_image_response img
+			send_menu
 		end
 		message = Message.create! :customer => @customer, :text => text
 	end
@@ -116,9 +133,7 @@ class WaiterController < ApplicationController
 
 			when "asked_for_free_option"
 				if is_a_pizza_code? text
-
 					pizza_price = get_pizza_price(@reply)
-
 					main_order = get_main_order text, @reply, @num_size, pizza_price
 					get_response main_order
 					Message.create! :customer => @customer, :text => main_order
@@ -148,23 +163,23 @@ class WaiterController < ApplicationController
 				end
 			# when "was_cancelled"
 			# 	start_order
-			end
 		end
 	end
+end
 
-	def is_start_word? text
-		text.downcase == ENV['START'].downcase
-	end
+def is_start_word? text
+	text.downcase == ENV['START'].downcase
+end
 
-	def has_pending_orders?
-		!@customer.orders.pending.empty?
-	end
+def has_pending_orders?
+	!@customer.orders.pending.empty?
+end
 
-	def set_customer
-		@customer = Customer.find_by_phone_number(params[:phone_number])
-		if @customer.nil?
-			@customer = Customer.create! phone_number: params[:phone_number], name: params[:name]
-		end
-		@customer
+def set_customer
+	@customer = Customer.find_by_phone_number(params[:phone_number])
+	if @customer.nil?
+		@customer = Customer.create! phone_number: params[:phone_number], name: params[:name]
 	end
+	@customer
+end
 end

@@ -17,8 +17,6 @@ class ApplicationController < ActionController::Base
 
   def get_pizza_name code
   	pizza = Pizza.where(Pizza.arel_table[:code].matches(code)).take.name
-  	# pizza = Pizza.find_by_code code.upcase
-  	# pizza.name
   end
 
   def get_pizza_size size
@@ -73,5 +71,15 @@ class ApplicationController < ActionController::Base
 
   def get_outlet_text_for_no_order_location place, name
   	"Sorry #{name} we do not yet have an outlet near #{place}"
+  end
+
+  def get_surburb text
+    surburb = Surburb.where(Surburb.arel_table[:name].matches(text)).take
+  end
+
+  def return_surburb_text surburb
+    outlet = surburb.outlet
+    text = ENV['OUTLET_MESSAGE'].gsub(/(?=\bis\b)/, surburb.name+' ')+' '+outlet.name.gsub(',','')
+    return outlet, text
   end
 end
