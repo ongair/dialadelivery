@@ -160,4 +160,11 @@ class WaiterControllerTest < ActionController::TestCase
     message = Message.last
     assert_equal message.text, "Your order details are as below, please confirm. Main Order: One Four Seasons Large. Free Pizza: One Meat Deluxe Large at KES 1000. Correct? (please reply with a yes or no)"
   end
+
+  test "It should return a message that there is no close outlet if they are too far away" do
+    response = post :order, { phone_number: "254716085380", address: "Mombasa", name: "Rachael", notification_type: "LocationReceived", latitude: -4.0434771, longitude: 39.6682065 }
+    
+    @message = Message.last
+    assert_equal @message.text, "Sorry Rachael we do not yet have an outlet near Mombasa"
+  end
 end

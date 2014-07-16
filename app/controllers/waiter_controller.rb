@@ -19,6 +19,11 @@ class WaiterController < ApplicationController
 					get_response text
 					send_menu
 					Message.create! :customer=>@customer, :text=>text
+				else
+					Surburb.create :name=>params[:text], :approved=>false
+					text = wrong_query
+					get_response text
+					Message.create! :text => text, :customer => @customer
 				end
 			else
 				process_text params[:text]

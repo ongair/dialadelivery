@@ -17,11 +17,15 @@ class ContactController < ApplicationController
 					send_vcard outlet
 					Message.create! :customer=>@customer, :text=>text
 				else
-					wrong_query
+					text = wrong_query
+					get_response text
+					Message.create! :text => text, :customer => @customer
 				end
 			else
 				Surburb.create :name=>params[:text], :approved=>false
-				wrong_query
+				text = wrong_query
+				get_response text
+				Message.create! :text => text, :customer => @customer
 			end
 		end
 		render json: { success: true }
@@ -83,12 +87,6 @@ class ContactController < ApplicationController
 			contact_number.push number.phone_number
 		end
 		response_vcard outlet.name.gsub(',',''), contact_number
-	end
-
-	def wrong_query
-		text = ENV['NO_SURBURB_MESSAGE'].gsub(/(?=\bPlease\b)/, @customer.name+'. ')
-		get_response text
-		Message.create! :text => text, :customer => @customer
 	end
 
 	def set_customer
