@@ -8,8 +8,9 @@ class WaiterController < ApplicationController
 			if is_start_word? params[:text]
 				start_order
 			elsif is_a_surburb? params[:text]
+				surburb = get_surburb params[:text]
 				if surburb.approved
-					outlet, text = return_surburb_text surburb
+					outlet = surburb.outlet
 					if outlet
 						text = get_outlet_text_for_order_location surburb.name, outlet.name
 					else
