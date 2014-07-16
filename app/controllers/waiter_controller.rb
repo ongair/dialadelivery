@@ -110,8 +110,8 @@ class WaiterController < ApplicationController
 			case order.order_step
 			when "sent_steps"
 				Surburb.create :name=>params[:text], :approved=>false
-				text = wrong_query
-				get_response text
+				send_text = wrong_query text
+				get_response send_text
 				Message.create! :text => text, :customer => @customer
 
 			when "sent_menu", "was_cancelled"
