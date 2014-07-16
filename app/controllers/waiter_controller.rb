@@ -5,10 +5,9 @@ class WaiterController < ApplicationController
 
 	def order
 		if params[:notification_type]=="MessageReceived"
-			surburb = get_surburb params[:text]
 			if is_start_word? params[:text]
 				start_order
-			elsif surburb
+			elsif is_a_surburb? params[:text]
 				if surburb.approved
 					outlet, text = return_surburb_text surburb
 					if outlet
@@ -16,9 +15,10 @@ class WaiterController < ApplicationController
 					else
 						text = get_outlet_text_for_no_order_location surburb.name, @customer.name
 					end
-					get_response text
-					send_menu
+					# get_response text
+					# send_menu
 					Message.create! :customer=>@customer, :text=>text
+					order = set_order
 					order.order_step = "sent_menu"
 					order.save
 				else
@@ -36,6 +36,11 @@ class WaiterController < ApplicationController
 	end
 
 	private
+
+	def is_a_surburb? text
+		surburb = get_surburb text
+		!surburb.nil?
+	end
 
 	def get_response text
 		if Rails.env.production?
