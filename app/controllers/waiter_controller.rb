@@ -117,7 +117,7 @@ class WaiterController < ApplicationController
 					puts ">>>>>>>>>#{@num_size}"
 					
 					get_response reply
-					@reply = reply.split(': ')[-1]
+					@@reply = reply.split(': ')[-1]
 					order.order_step = "asked_for_free_option"
 					order.save
 					Message.create! :customer => @customer, :text => reply
@@ -134,8 +134,8 @@ class WaiterController < ApplicationController
 
 			when "asked_for_free_option"
 				if is_a_pizza_code? text
-					pizza_price = get_pizza_price(@reply)
-					main_order = get_main_order text, @reply, @num_size, pizza_price
+					pizza_price = get_pizza_price(@@reply)
+					main_order = get_main_order text, @@reply, @num_size, pizza_price
 					get_response main_order
 					Message.create! :customer => @customer, :text => main_order
 					order.order_step = "asked_for_confirmation"
