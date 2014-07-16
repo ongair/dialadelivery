@@ -17,7 +17,7 @@ class WaiterController < ApplicationController
 						text = get_outlet_text_for_no_order_location surburb.name, @customer.name
 					end
 					get_response text
-					# send_menu
+					send_menu
 					Message.create! :customer=>@customer, :text=>text
 					order = set_order
 					order.order_step = "sent_menu"
