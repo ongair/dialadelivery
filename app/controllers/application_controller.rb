@@ -82,9 +82,9 @@ class ApplicationController < ActionController::Base
     text = ENV['OUTLET_MESSAGE'].gsub(/(?=\bis\b)/, surburb.name+' ')+' '+outlet.name.gsub(',','')
     return outlet, text
   end
-  
+
   def wrong_query
-    text = ENV['NO_SURBURB_MESSAGE'].gsub(/(?=\bPlease\b)/, @customer.name+'. ')
+    text = ENV['NO_OUTLET_MESSAGE'].gsub(/(?=\bPlease\b)/, @customer.name+'. ')
     
   end
 end
