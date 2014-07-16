@@ -19,14 +19,16 @@ class WaiterController < ApplicationController
 					get_response text
 					send_menu
 					Message.create! :customer=>@customer, :text=>text
+					order.order_step = "sent_menu"
+					order.save
 				else
-					Surburb.create :name=>params[:text], :approved=>false
 					text = wrong_query
 					get_response text
 					Message.create! :text => text, :customer => @customer
 				end
 			else
-				process_text params[:text]
+				
+				process_text params[:text], order
 			end
 		elsif params[:notification_type]=="LocationReceived"
 			return_location
@@ -50,7 +52,7 @@ class WaiterController < ApplicationController
 	end
 
 	def start_order
-		order = Order.create! customer_id: @customer.id, order_step: "sent_menu"
+		order = Order.create! customer_id: @customer.id, order_step: "sent_steps"
 		reply order
 	end
 
@@ -98,14 +100,21 @@ class WaiterController < ApplicationController
 	end
 
 	def process_text text
-		text.downcase!
 		order = set_order
+		text.downcase!
+		
 		if text == 'cancel'
 			send_cancel_order_text
 			order.order_step = "was_cancelled"
 			order.save
 		else
 			case order.order_step
+			when "sent_steps"
+				Surburb.create :name=>params[:text], :approved=>false
+				text = wrong_query
+				get_response text
+				Message.create! :text => text, :customer => @customer
+
 			when "sent_menu", "was_cancelled"
 				if is_a_main_order?(text)
 					reply = "Your order details: "
