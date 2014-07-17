@@ -29,11 +29,21 @@ class WaiterControllerTest < ActionController::TestCase
     assert_equal message.text, "Your order for Ngong road will be sent to #{outlets(:ngong_road).name}"
   end
 
+
+  test "It should detect a location from the text received if a user sends in the location as a word" do
+    post :order, { phone_number: "254722200200", name: "Trevor", text: "PIZZA", notification_type: "MessageReceived" }
+    post :order, { phone_number: "254722200200", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" } 
+
+    @message = Message.last
+    assert_equal @message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}"
+  end
+
   test "It should return a message that there is no close outlet if they are too far away" do
-    post :order, { phone_number: "254716085380", address: "Mombasa", name: "Rachael", notification_type: "LocationReceived", latitude: -4.0434771, longitude: 39.6682065 }
+    post :order, { phone_number: "254722200200", name: "Trevor", text: "PIZZA", notification_type: "MessageReceived" }
+    post :order, { phone_number: "254722200200", address: "Mombasa", name: "Rachael", notification_type: "LocationReceived", latitude: -4.0434771, longitude: 39.6682065 }
 
     message = Message.last
-    assert_equal message.text, "Sorry Rachael we do not yet have an outlet near Mombasa"
+    assert_equal message.text, "Sorry Trevor we do not yet have an outlet near Mombasa"
   end
 
   test "Should return customer's main order details and ask what free pizza they want" do
@@ -120,13 +130,6 @@ class WaiterControllerTest < ActionController::TestCase
     assert_equal message.text, "What free Pizza would you like to have?"
   end
 
-  test "It should detect a location from the text received if a user sends in the location as a word" do
-    response = post :order, { phone_number: "254716085380", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" } 
-
-    @message = Message.last
-    assert_equal @message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}"
-  end
-
   test "whole process with Surburb text" do
     response = post :order, { phone_number: "254722200200", name: "Trevor", text: "PIZZA", notification_type: "MessageReceived" }
     assert_equal response.code, "200"
@@ -165,12 +168,41 @@ class WaiterControllerTest < ActionController::TestCase
     assert_equal message.text, "Thank you for ordering with Dial-a-Delivery, your pizza should be ready in 45 minutes, we hope you will be hungry by then."
   end
 
-  test "It should return a message that there is no close outlet if they are too far away" do
+  test "whole process with Surburb text and free pizza with size" do
     response = post :order, { phone_number: "254722200200", name: "Trevor", text: "PIZZA", notification_type: "MessageReceived" }
     assert_equal response.code, "200"
 
-    response = post :order, { phone_number: "254716085380", address: "Mombasa", name: "Rachael", notification_type: "LocationReceived", latitude: -4.0434771, longitude: 39.6682065 }
+    response = post :order, { phone_number: "254722200200", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" } 
     @message = Message.last
-    assert_equal @message.text, "Sorry Rachael we do not yet have an outlet near Mombasa"
+    assert_equal @message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}"
+    assert_equal response.code, "200"
+
+    response = post :order, { phone_number: "254722200200", name: "Muaad", text: "5bm", notification_type: "MessageReceived" }
+    message = Message.all[-2]
+    assert_equal message.text, "Your order details: 5 Four Seasons Medium"
+    message = Message.last
+    assert_equal message.text, "What free Pizza would you like to have?"
+
+    response = post :order, { phone_number: "254722200200", name: "Cynthia", text: "x", notification_type: "MessageReceived" }
+    message = Message.last
+    assert_equal message.text, "Sorry Trevor. Wrong format of reply. Please send either an A, B, C or D depending on the code of the pizza you want"
+
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "Cancel", notification_type: "MessageReceived" }
+    message = Message.last
+    assert_equal message.text, "Your order has been cancelled."
+
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "b l", notification_type: "MessageReceived" }
+    message = Message.all[-2]
+    assert_equal message.text, "Your order details: One Four Seasons Large"
+    message = Message.last
+    assert_equal message.text, "What free Pizza would you like to have?"
+
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "AL", notification_type: "MessageReceived" }
+    message = Message.last
+    assert_equal message.text, "Your order details are as below, please confirm. Main Order: One Four Seasons Large. Free Pizza: One Meat Deluxe Large at KES 1000. Correct? (please reply with a yes or no)"
+
+    response = post :order, { phone_number: "254722200200", name: "Nyako", text: "yes", notification_type: "MessageReceived" }
+    message = Message.last
+    assert_equal message.text, "Thank you for ordering with Dial-a-Delivery, your pizza should be ready in 45 minutes, we hope you will be hungry by then."
   end
 end

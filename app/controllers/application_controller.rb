@@ -12,7 +12,7 @@ class ApplicationController < ActionController::Base
   end
 
   def is_a_main_order? text
-  	is_a_pizza_code?(text[-2]) && is_a_pizza_size?(text[-1])
+    is_a_pizza_code?(text[-2]) && is_a_pizza_size?(text[-1])
   end
 
   def get_pizza_name code

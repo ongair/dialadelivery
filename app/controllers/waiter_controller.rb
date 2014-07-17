@@ -47,13 +47,14 @@ class WaiterController < ApplicationController
 		if Rails.env.production?
 			url = URI.parse(ENV['API_URL'])
 			response = HTTParty.post(url, body: { token: ENV['TOKEN'],  phone_number: @customer.phone_number, text: text, thread: true}, debug_output: $stdout)
-
 		end
 	end
 
 	def get_image_response img
-		url = URI.parse(ENV['API_IMAGE_URL'])
-		image_response = HTTMultiParty.post(url, body: { token: ENV['TOKEN'],  phone_number: @customer.phone_number, image: img, thread: true }, debug_output: $stdout)
+		if Rails.env.production?
+			url = URI.parse(ENV['API_IMAGE_URL'])
+			image_response = HTTMultiParty.post(url, body: { token: ENV['TOKEN'],  phone_number: @customer.phone_number, image: img, thread: true }, debug_output: $stdout)
+		end
 	end
 
 	def start_order
@@ -107,6 +108,7 @@ class WaiterController < ApplicationController
 	def process_text text
 		order = set_order
 		text.downcase!
+		text.delete!(' ')
 		
 		if text == 'cancel'
 			send_cancel_order_text
@@ -151,9 +153,9 @@ class WaiterController < ApplicationController
 				end
 
 			when "asked_for_free_option"
-				if is_a_pizza_code? text
+				if is_a_pizza_code? text[0]
 					pizza_price = get_pizza_price(@@reply)
-					main_order = get_main_order text, @@reply, @@num_size, pizza_price
+					main_order = get_main_order text[0], @@reply, @@num_size, pizza_price
 					get_response main_order
 					Message.create! :customer => @customer, :text => main_order
 					order.order_step = "asked_for_confirmation"
