@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: order_questions
+#
+#  id         :integer          not null, primary key
+#  order_type :string(255)
+#  text       :string(255)
+#  created_at :datetime
+#  updated_at :datetime
+#
+
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
 one:
@@ -7,3 +18,7 @@ one:
 two:
   order_type: order_complete
   text: "Thank you for ordering with Dial-a-Delivery, your pizza should be ready in 45 minutes, we hope you will be hungry by then."
+
+three:
+  order_type: steps_for_ordering
+  text: Ordering your Pizza via Whatsapp is easy. Just follow these 3 steps..

@@ -8,7 +8,7 @@ class ApplicationController < ActionController::Base
   end
 
   def is_a_pizza_size? size
-  	['s','m','l'].include? size
+  	['r','m','l'].include? size
   end
 
   def is_a_main_order? text
@@ -21,7 +21,7 @@ class ApplicationController < ActionController::Base
 
   def get_pizza_size size
   	sizes = {
-  		's' => 'Small',
+  		'r' => 'Regular',
   		'm' => 'Medium',
   		'l' => 'Large'
   	}

@@ -16,7 +16,7 @@ class ContactControllerTest < ActionController::TestCase
 		@message = Message.last
 
 		assert_equal @message.customer.phone_number, "254716085380"
-		assert_equal @message.text, "Sorry Rachael. Please share your location via WhatsApp"
+		assert_equal @message.text, "Sorry Rachael. Please share your location via WhatsApp."
 	end
 
 	test "It should return the closest outlet when a user sends their location" do
