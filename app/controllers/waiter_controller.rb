@@ -86,6 +86,9 @@ class WaiterController < ApplicationController
 		response = get_response text
 		if outlet
 			send_menu
+			order = set_order
+			order.order_step = "sent_menu"
+			order.save
 		end
 		message = Message.create! :customer => @customer, :text => text
 	end
