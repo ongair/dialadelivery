@@ -102,14 +102,17 @@ class ApplicationController < ActionController::Base
       params = {
         'phone_number' => @customer.phone_number,
         'token' => ENV['TOKEN'],
-        'first_name' => first_name
+        'first_name' => first_name,
+        'thread' => true
       }
       contact_number.each do |contact|
         index = contact_number.index contact
         params["contact_number[#{index}]"] = contact
       end
+      print "#{params}"
+
       url = URI.parse(ENV['API_VCARD_URL'])
-      response = Net::HTTP.post_form(url, params)
+      response = HTTParty.post(url, body: params, debug_output: $stdout)
     end
   end
 end
