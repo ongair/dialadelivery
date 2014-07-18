@@ -223,4 +223,36 @@ class WaiterControllerTest < ActionController::TestCase
     message = Message.last
     assert_equal message.text, "Your order has been cancelled."
   end
+
+   test "whole process without start word" do
+    response = post :order, { phone_number: "254722200200", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" } 
+    @message = Message.last
+    assert_equal @message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}. We are sending you their contacts shortly and a menu from whose codes to pick your order.."
+
+    assert_equal response.code, "200"
+
+    response = post :order, { phone_number: "254722200200", name: "Muaad", text: "5bm", notification_type: "MessageReceived" }
+    message = Message.last
+    assert_equal message.text, "Your order details: 5 Four Seasons Medium. What free Pizza would you like to have?"
+
+    response = post :order, { phone_number: "254722200200", name: "Cynthia", text: "x", notification_type: "MessageReceived" }
+    message = Message.last
+    assert_equal message.text, "Sorry Rachael. Wrong format of reply. Please send either an A, B, C or D depending on the code of the pizza you want"
+
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "Cancel", notification_type: "MessageReceived" }
+    message = Message.last
+    assert_equal message.text, "Your order has been cancelled."
+
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "b l", notification_type: "MessageReceived" }
+    message = Message.last
+    assert_equal message.text, "Your order details: One Four Seasons Large. What free Pizza would you like to have?"
+
+    response = post :order, { phone_number: "254722200200", name: "Trevor", text: "AL", notification_type: "MessageReceived" }
+    message = Message.last
+    assert_equal message.text, "Your order details are as below, please confirm. Main Order: One Four Seasons Large. Free Pizza: One Meat Deluxe Large at KES 1000. Correct? (please reply with a yes or no)"
+
+    response = post :order, { phone_number: "254722200200", name: "Nyako", text: "no", notification_type: "MessageReceived" }
+    message = Message.last
+    assert_equal message.text, "Your order has been cancelled."
+  end
 end

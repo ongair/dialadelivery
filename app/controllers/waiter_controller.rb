@@ -108,13 +108,17 @@ class WaiterController < ApplicationController
 
 	def set_order
 		order = @customer.orders.last
+		if order.nil?
+			order = Order.create! customer_id: @customer.id, order_step: "sent_menu"
+		end
+		order
 	end
 
 	def process_text text
 		order = set_order
 		text.downcase!
 		text.delete!(' ')
-		
+
 		if text == 'cancel'
 			send_cancel_order_text
 			order.order_step = "was_cancelled"
@@ -141,7 +145,7 @@ class WaiterController < ApplicationController
 					reply = reply+get_pizza_name(text[-2])+' '+size
 					order_question = get_order_question "free_pizza"
 					@@num_size.push size
-					
+
 					main_reply = reply+". "+order_question
 					get_response main_reply
 					@@reply = reply.split(': ')[-1]
