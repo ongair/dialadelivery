@@ -54,7 +54,7 @@ class ApplicationController < ActionController::Base
   end
 
   def get_wrong_main_order_format name
-  	"Sorry #{name}. Wrong format of reply. Please start with a number then order code, either A, B, C or D then the size either S for Small, M for Medium or L for Large"
+  	"Sorry #{name}. Wrong format of reply. Please start with a number then order code, either A, B, C or D then the size either R for Regular, M for Medium or L for Large"
   end
 
   def get_wrong_free_pizza_format name
