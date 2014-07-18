@@ -61,7 +61,7 @@ class WaiterController < ApplicationController
 	end
 
 	def start_order
-		order = Order.create! customer_id: @customer.id, order_step: "sent_menu"
+		order = Order.create! customer_id: @customer.id, order_step: "sent_steps"
 		reply order
 	end
 
@@ -109,7 +109,7 @@ class WaiterController < ApplicationController
 	def set_order
 		order = @customer.orders.last
 		if order.nil?
-			order = Order.create! customer_id: @customer.id, order_step: "sent_menu"
+			order = Order.create! customer_id: @customer.id, order_step: "sent_steps"
 		end
 		order
 	end
@@ -133,7 +133,7 @@ class WaiterController < ApplicationController
 
 			when "sent_menu", "was_cancelled"
 				if is_a_main_order?(text)
-					reply = "Your order details: "
+					reply = "Great! You have made your order. Details are: "
 					if text[/\d/]
 						reply = reply+text[0]+' '
 						@@num_size = [text[0]]

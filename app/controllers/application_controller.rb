@@ -68,7 +68,7 @@ class ApplicationController < ActionController::Base
   def get_outlet_text_for_order_location place, name
   	text = "Your order for #{place} will be sent to #{name}. "
     text = text+"We are sending you their contacts shortly "
-    text = text+"and a menu from whose codes to pick your order.."
+    text = text+"and a menu from which to pick your order.."
   end
 
   def get_outlet_text_for_no_order_location place, name
