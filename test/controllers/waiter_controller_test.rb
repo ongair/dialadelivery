@@ -51,10 +51,8 @@ class WaiterControllerTest < ActionController::TestCase
     post :order, { phone_number: "254722200200", name: "Trevor", text: "PIZZA", notification_type: "MessageReceived" }
     post :order, { phone_number: "254722200200", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
     post :order, { phone_number: "254722200200", name: "Trevor", text: "5BL", notification_type: "MessageReceived" }
-    message = Message.all[-2]
-    assert_equal message.text, "Your order details: 5 Four Seasons Large"
     message = Message.last
-    assert_equal message.text, "What free Pizza would you like to have?"
+    assert_equal message.text, "Your order details: 5 Four Seasons Large. What free Pizza would you like to have?"
 
     post :order, { phone_number: "254722200200", name: "Trevor", text: "A", notification_type: "MessageReceived" }
     message = Message.last
@@ -69,10 +67,8 @@ class WaiterControllerTest < ActionController::TestCase
     post :order, { phone_number: "254722200200", name: "Trevor", text: "PIZZA", notification_type: "MessageReceived" }
     post :order, { phone_number: "254722200200", name: "Trevor", text: "Jamuhuri", notification_type: "MessageReceived" }
     post :order, { phone_number: "254722200200", name: "Trevor", text: "BL", notification_type: "MessageReceived" }
-    message = Message.all[-2]
-    assert_equal message.text, "Your order details: One Four Seasons Large"
     message = Message.last
-    assert_equal message.text, "What free Pizza would you like to have?"
+    assert_equal message.text, "Your order details: One Four Seasons Large. What free Pizza would you like to have?"
 
     post :order, { phone_number: "254722200200", name: "Trevor", text: "A", notification_type: "MessageReceived" }
     message = Message.last
@@ -88,10 +84,8 @@ class WaiterControllerTest < ActionController::TestCase
     post :order, { phone_number: "254722200200", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
 
     post :order, { phone_number: "254722200200", name: "Trevor", text: "5Cr", notification_type: "MessageReceived" }
-    message = Message.all[-2]
-    assert_equal message.text, "Your order details: 5 Hawaiian Regular"
     message = Message.last
-    assert_equal message.text, "What free Pizza would you like to have?"
+    assert_equal message.text, "Your order details: 5 Hawaiian Regular. What free Pizza would you like to have?"
 
     post :order, { phone_number: "254722200200", name: "Trevor", text: "x", notification_type: "MessageReceived" }
     message = Message.last
@@ -111,10 +105,8 @@ class WaiterControllerTest < ActionController::TestCase
     post :order, { phone_number: "254722200200", name: "Trevor", text: "IHUB", notification_type: "MessageReceived" }
 
     post :order, { phone_number: "254722200200", name: "Trevor", text: "5bm", notification_type: "MessageReceived" }
-    message = Message.all[-2]
-    assert_equal message.text, "Your order details: 5 Four Seasons Medium"
     message = Message.last
-    assert_equal message.text, "What free Pizza would you like to have?"
+    assert_equal message.text, "Your order details: 5 Four Seasons Medium. What free Pizza would you like to have?"
 
     post :order, { phone_number: "254722200200", name: "Trevor", text: "x", notification_type: "MessageReceived" }
     message = Message.last
@@ -125,10 +117,8 @@ class WaiterControllerTest < ActionController::TestCase
     assert_equal message.text, "Your order has been cancelled."
 
     post :order, { phone_number: "254722200200", name: "Trevor", text: "1bl", notification_type: "MessageReceived" }
-    message = Message.all[-2]
-    assert_equal message.text, "Your order details: 1 Four Seasons Large"
     message = Message.last
-    assert_equal message.text, "What free Pizza would you like to have?"
+    assert_equal message.text, "Your order details: 1 Four Seasons Large. What free Pizza would you like to have?"
   end
 
   test "whole process with Surburb text" do
@@ -141,10 +131,8 @@ class WaiterControllerTest < ActionController::TestCase
     assert_equal response.code, "200"
 
     response = post :order, { phone_number: "254722200200", name: "Muaad", text: "5bm", notification_type: "MessageReceived" }
-    message = Message.all[-2]
-    assert_equal message.text, "Your order details: 5 Four Seasons Medium"
     message = Message.last
-    assert_equal message.text, "What free Pizza would you like to have?"
+    assert_equal message.text, "Your order details: 5 Four Seasons Medium. What free Pizza would you like to have?"
 
     response = post :order, { phone_number: "254722200200", name: "Cynthia", text: "x", notification_type: "MessageReceived" }
     message = Message.last
@@ -155,10 +143,8 @@ class WaiterControllerTest < ActionController::TestCase
     assert_equal message.text, "Your order has been cancelled."
 
     response = post :order, { phone_number: "254722200200", name: "Trevor", text: "bl", notification_type: "MessageReceived" }
-    message = Message.all[-2]
-    assert_equal message.text, "Your order details: One Four Seasons Large"
     message = Message.last
-    assert_equal message.text, "What free Pizza would you like to have?"
+    assert_equal message.text, "Your order details: One Four Seasons Large. What free Pizza would you like to have?"
 
     response = post :order, { phone_number: "254722200200", name: "Trevor", text: "A", notification_type: "MessageReceived" }
     message = Message.last
@@ -179,10 +165,8 @@ class WaiterControllerTest < ActionController::TestCase
     assert_equal response.code, "200"
 
     response = post :order, { phone_number: "254722200200", name: "Muaad", text: "5bm", notification_type: "MessageReceived" }
-    message = Message.all[-2]
-    assert_equal message.text, "Your order details: 5 Four Seasons Medium"
     message = Message.last
-    assert_equal message.text, "What free Pizza would you like to have?"
+    assert_equal message.text, "Your order details: 5 Four Seasons Medium. What free Pizza would you like to have?"
 
     response = post :order, { phone_number: "254722200200", name: "Cynthia", text: "x", notification_type: "MessageReceived" }
     message = Message.last
@@ -193,10 +177,8 @@ class WaiterControllerTest < ActionController::TestCase
     assert_equal message.text, "Your order has been cancelled."
 
     response = post :order, { phone_number: "254722200200", name: "Trevor", text: "b l", notification_type: "MessageReceived" }
-    message = Message.all[-2]
-    assert_equal message.text, "Your order details: One Four Seasons Large"
     message = Message.last
-    assert_equal message.text, "What free Pizza would you like to have?"
+    assert_equal message.text, "Your order details: One Four Seasons Large. What free Pizza would you like to have?"
 
     response = post :order, { phone_number: "254722200200", name: "Trevor", text: "AL", notification_type: "MessageReceived" }
     message = Message.last
@@ -218,10 +200,8 @@ class WaiterControllerTest < ActionController::TestCase
     assert_equal response.code, "200"
 
     response = post :order, { phone_number: "254722200200", name: "Muaad", text: "5bm", notification_type: "MessageReceived" }
-    message = Message.all[-2]
-    assert_equal message.text, "Your order details: 5 Four Seasons Medium"
     message = Message.last
-    assert_equal message.text, "What free Pizza would you like to have?"
+    assert_equal message.text, "Your order details: 5 Four Seasons Medium. What free Pizza would you like to have?"
 
     response = post :order, { phone_number: "254722200200", name: "Cynthia", text: "x", notification_type: "MessageReceived" }
     message = Message.last
@@ -232,10 +212,8 @@ class WaiterControllerTest < ActionController::TestCase
     assert_equal message.text, "Your order has been cancelled."
 
     response = post :order, { phone_number: "254722200200", name: "Trevor", text: "b l", notification_type: "MessageReceived" }
-    message = Message.all[-2]
-    assert_equal message.text, "Your order details: One Four Seasons Large"
     message = Message.last
-    assert_equal message.text, "What free Pizza would you like to have?"
+    assert_equal message.text, "Your order details: One Four Seasons Large. What free Pizza would you like to have?"
 
     response = post :order, { phone_number: "254722200200", name: "Trevor", text: "AL", notification_type: "MessageReceived" }
     message = Message.last

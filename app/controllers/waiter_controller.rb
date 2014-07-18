@@ -139,18 +139,15 @@ class WaiterController < ApplicationController
 					end
 					size = get_pizza_size(text[-1])
 					reply = reply+get_pizza_name(text[-2])+' '+size
+					order_question = get_order_question "free_pizza"
 					@@num_size.push size
 					
-					get_response reply
+					main_reply = reply+". "+order_question
+					get_response main_reply
 					@@reply = reply.split(': ')[-1]
 					order.order_step = "asked_for_free_option"
 					order.save
-					Message.create! :customer => @customer, :text => reply
-					
-					
-					order_question = get_order_question "free_pizza"
-					get_response order_question
-					Message.create! :customer => @customer, :text => order_question
+					Message.create! :customer => @customer, :text => main_reply
 				else
 					wrong_main_order_format = get_wrong_main_order_format @customer.name
 					get_response wrong_main_order_format
