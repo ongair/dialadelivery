@@ -18,10 +18,10 @@ class WaiterController < ApplicationController
 					end
 					get_response text
 					send_menu
-					Message.create! :customer=>@customer, :text=>text
 					order = set_order
 					order.order_step = "sent_menu"
 					order.save
+					Message.create! :customer=>@customer, :text=>text
 				else
 					text = wrong_query
 					get_response text
@@ -58,18 +58,17 @@ class WaiterController < ApplicationController
 	end
 
 	def start_order
-		order = Order.create! customer_id: @customer.id, order_step: "sent_steps"
+		order = Order.create! customer_id: @customer.id, order_step: "sent_menu"
 		reply order
 	end
 
 	def reply order
-		path = Rails.root + 'app/assets/images/steps.jpg'
-		img = File.new(path)
-
 		order_details = get_order_question "steps_for_ordering"
 		get_response order_details
 		Message.create! :customer => @customer, :text => order_details
 
+		path = Rails.root + 'app/assets/images/steps.jpg'
+		img = File.new(path)
 		get_image_response img
 	end
 
@@ -106,11 +105,6 @@ class WaiterController < ApplicationController
 
 	def set_order
 		order = @customer.orders.last
-		# if order.nil? || order.order_step == "was_cancelled"
-		# 	Order.create! customer_id: @customer.id, order_step: "sent_menu"
-		# 	order = @customer.orders.last
-		# end
-		# order
 	end
 
 	def process_text text
