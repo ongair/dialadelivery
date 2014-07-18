@@ -61,7 +61,7 @@ class WaiterController < ApplicationController
 	end
 
 	def start_order
-		order = Order.create! customer_id: @customer.id, order_step: "sent_steps"
+		order = Order.create! customer_id: @customer.id, order_step: "sent_menu"
 		reply order
 	end
 
