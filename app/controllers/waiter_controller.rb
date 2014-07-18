@@ -65,6 +65,11 @@ class WaiterController < ApplicationController
 	def reply order
 		path = Rails.root + 'app/assets/images/steps.jpg'
 		img = File.new(path)
+
+		order_details = get_order_question "steps_for_ordering"
+		get_response order_details
+		Message.create! :customer => @customer, :text => order_details
+
 		get_image_response img
 	end
 
@@ -90,7 +95,7 @@ class WaiterController < ApplicationController
 			order.order_step = "sent_menu"
 			order.save
 		end
-		message = Message.create! :customer => @customer, :text => text
+		Message.create! :customer => @customer, :text => text
 	end
 
 	def send_cancel_order_text
@@ -177,7 +182,7 @@ class WaiterController < ApplicationController
 					order.order_step = "order_completed"
 					order.save
 				elsif text == "no"
-					cancel_order
+					send_cancel_order_text
 					order.order_step = "was_cancelled"
 					order.save
 				else
