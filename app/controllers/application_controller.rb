@@ -88,4 +88,28 @@ class ApplicationController < ActionController::Base
   def wrong_query
     text = ENV['NO_SURBURB_MESSAGE'].gsub(/(?=\bPlease\b)/, @customer.name+'. ')
   end
+
+  def send_vcard outlet
+    contact_number = []
+    outlet.outlet_contacts.each do |number|
+      contact_number.push number.phone_number
+    end
+    response_vcard outlet.name.gsub(',',''), contact_number
+  end
+
+  def response_vcard first_name, contact_number
+    if Rails.env.production?
+      params = {
+        'phone_number' => @customer.phone_number,
+        'token' => ENV['TOKEN'],
+        'first_name' => first_name
+      }
+      contact_number.each do |contact|
+        index = contact_number.index contact
+        params["contact_number[#{index}]"] = contact
+      end
+      url = URI.parse(ENV['API_VCARD_URL'])
+      response = Net::HTTP.post_form(url, params)
+    end
+  end
 end

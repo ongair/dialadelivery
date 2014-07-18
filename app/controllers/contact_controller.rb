@@ -45,22 +45,6 @@ class ContactController < ApplicationController
 		end
 	end
 
-	def response_vcard first_name, contact_number
-		if Rails.env.production?
-			params = {
-				'phone_number' => @customer.phone_number,
-				'token' => ENV['TOKEN'],
-				'first_name' => first_name
-			}
-			contact_number.each do |contact|
-				index = contact_number.index contact
-				params["contact_number[#{index}]"] = contact
-			end
-			url = URI.parse(ENV['API_VCARD_URL'])
-			response = Net::HTTP.post_form(url, params)
-		end
-	end
-
 	def return_location
 		place = params[:address]
 		location = Location.create! :name => params[:address], :latitude => params[:latitude], :longitude => params[:longitude], :customer => @customer
@@ -77,16 +61,6 @@ class ContactController < ApplicationController
 			send_vcard outlet
 		end
 		Message.create! :customer => @customer, :text => text
-	end
-
-	
-
-	def send_vcard outlet
-		contact_number = []
-		outlet.outlet_contacts.each do |number|
-			contact_number.push number.phone_number
-		end
-		response_vcard outlet.name.gsub(',',''), contact_number
 	end
 
 	def set_customer

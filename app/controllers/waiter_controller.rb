@@ -17,10 +17,13 @@ class WaiterController < ApplicationController
 						text = get_outlet_text_for_no_order_location surburb.name, @customer.name
 					end
 					get_response text
-					send_menu
-					order = set_order
-					order.order_step = "sent_menu"
-					order.save
+					if outlet
+						send_vcard outlet
+						send_menu
+						order = set_order
+						order.order_step = "sent_menu"
+						order.save
+					end
 					Message.create! :customer=>@customer, :text=>text
 				else
 					text = wrong_query
@@ -58,7 +61,7 @@ class WaiterController < ApplicationController
 	end
 
 	def start_order
-		order = Order.create! customer_id: @customer.id, order_step: "sent_menu"
+		order = Order.create! customer_id: @customer.id, order_step: "sent_steps"
 		reply order
 	end
 

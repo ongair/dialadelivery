@@ -36,7 +36,7 @@ class WaiterControllerTest < ActionController::TestCase
     post :order, { phone_number: "254722200200", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" } 
 
     @message = Message.last
-    assert_equal @message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}.  We are sending you their contacts shortly and a menu from whose codes to pick your order.."
+    assert_equal @message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}. We are sending you their contacts shortly and a menu from whose codes to pick your order.."
   end
 
   test "It should return a message that there is no close outlet if they are too far away" do
@@ -137,7 +137,7 @@ class WaiterControllerTest < ActionController::TestCase
 
     response = post :order, { phone_number: "254722200200", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" } 
     @message = Message.last
-    assert_equal @message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}.  We are sending you their contacts shortly and a menu from whose codes to pick your order.."
+    assert_equal @message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}. We are sending you their contacts shortly and a menu from whose codes to pick your order.."
     assert_equal response.code, "200"
 
     response = post :order, { phone_number: "254722200200", name: "Muaad", text: "5bm", notification_type: "MessageReceived" }
@@ -175,7 +175,7 @@ class WaiterControllerTest < ActionController::TestCase
 
     response = post :order, { phone_number: "254722200200", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" } 
     @message = Message.last
-    assert_equal @message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}.  We are sending you their contacts shortly and a menu from whose codes to pick your order.."
+    assert_equal @message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}. We are sending you their contacts shortly and a menu from whose codes to pick your order.."
     assert_equal response.code, "200"
 
     response = post :order, { phone_number: "254722200200", name: "Muaad", text: "5bm", notification_type: "MessageReceived" }
@@ -244,17 +244,5 @@ class WaiterControllerTest < ActionController::TestCase
     response = post :order, { phone_number: "254722200200", name: "Nyako", text: "no", notification_type: "MessageReceived" }
     message = Message.last
     assert_equal message.text, "Your order has been cancelled."
-  end
-
-  test "whole process" do
-    post :order, { phone_number: "254722200200", name: "Trevor", text: "PIZZA", notification_type: "MessageReceived" }
-    post :order, { phone_number: "254722200200", name: "Trevor", text: "Jamuhuri", notification_type: "MessageReceived" }
-    post :order, { phone_number: "254722200200", name: "Trevor", text: "BR", notification_type: "MessageReceived" }
-    post :order, { phone_number: "254722200200", name: "Trevor", text: "D", notification_type: "MessageReceived" }
- 
-    message = Message.last
-    assert_equal message.text, "Your order details are as below, please confirm. Main Order: One Four Seasons Regular. Free Pizza: One Peri-Peri Chicken Regular at KES 600. Correct? (please reply with a yes or no)"
-
-
   end
 end
