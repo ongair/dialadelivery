@@ -85,8 +85,9 @@ class ApplicationController < ActionController::Base
     return outlet, text
   end
 
-  def wrong_query
-    text = ENV['NO_SURBURB_MESSAGE'].gsub(/(?=\bPlease\b)/, @customer.name+'. ')
+  def wrong_query place
+    text = ENV['NO_SURBURB_MESSAGE'].gsub(/(?=\bwe\b)/, @customer.name+'. ')
+    text = text.gsub(/(?=\bas\b)/, place)
   end
 
   def send_vcard outlet
