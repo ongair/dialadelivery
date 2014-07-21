@@ -17,13 +17,13 @@ class ContactController < ApplicationController
 					send_vcard outlet
 					Message.create! :customer=>@customer, :text=>text
 				else
-					text = wrong_query
+					text = wrong_query params[:text]
 					get_response text
 					Message.create! :text => text, :customer => @customer
 				end
 			else
 				Surburb.create :name=>params[:text], :approved=>false
-				text = wrong_query
+				text = wrong_query params[:text]
 				get_response text
 				Message.create! :text => text, :customer => @customer
 			end
