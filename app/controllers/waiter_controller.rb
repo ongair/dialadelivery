@@ -105,17 +105,15 @@ class WaiterController < ApplicationController
 		text.downcase!
 		text.delete!(' ')
 
-		if order.nil? || order.order_step=="order_completed"
-			Surburb.create :name=>params[:text], :approved=>false
-			send_text = wrong_query params[:text]
-			get_response send_text
-			Message.create! :text => text, :customer => @customer
-		end
-
 		if text == 'cancel'
 			send_cancel_order_text
 			order.order_step = "was_cancelled"
 			order.save
+		elsif order.nil? || order.order_step=="order_completed"
+			Surburb.create :name=>params[:text], :approved=>false
+			send_text = wrong_query params[:text]
+			get_response send_text
+			Message.create! :text => send_text, :customer => @customer
 		else
 			case order.order_step
 			when "sent_menu", "was_cancelled"

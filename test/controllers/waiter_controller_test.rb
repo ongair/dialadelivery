@@ -232,4 +232,10 @@ class WaiterControllerTest < ActionController::TestCase
     message = Message.last
     assert_equal message.text, "Your order has been cancelled."
   end
+
+  test "Should return not recognized as a Surburb" do
+    post :order, { phone_number: "254722200200", text: "Machakos", name: "Rachael", notification_type: "MessageReceived" } 
+    message = Message.last
+    assert_equal message.text, "Sorry Rachael. we do not yet recogize machakos as a location. Please share your location via WhatsApp."
+  end
 end
