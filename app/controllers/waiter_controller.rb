@@ -16,8 +16,7 @@ class WaiterController < ApplicationController
 					else
 						text = get_outlet_text_for_no_order_location surburb.name, @customer.name
 					end
-					get_response text
-					Message.create! :customer=>@customer, :text=>text
+					send_message text
 					if outlet
 						start_order outlet
 					end
@@ -34,6 +33,10 @@ class WaiterController < ApplicationController
 	end
 
 	private
+	def send_message text
+		message = Message.create! :customer=>@customer, :text=>text
+		message.deliver
+	end
 
 	def is_a_surburb? text
 		surburb = get_surburb text
@@ -82,9 +85,7 @@ class WaiterController < ApplicationController
 		else
 			text = get_outlet_text_for_no_order_location place, @customer.name
 		end
-		response = get_response text
-		Message.create! :customer => @customer, :text => text
-
+		send_message text
 		if outlet
 			start_order outlet
 		end
@@ -92,8 +93,7 @@ class WaiterController < ApplicationController
 
 	def send_cancel_order_text
 		cancel_order_text = "Your order has been cancelled."
-		get_response cancel_order_text
-		Message.create! :customer => @customer, :text => cancel_order_text
+		send_message cancel_order_text
 	end
 
 	def set_order
@@ -112,8 +112,7 @@ class WaiterController < ApplicationController
 		elsif order.nil? || order.order_step=="order_completed"
 			Surburb.create :name=>params[:text], :approved=>false
 			send_text = wrong_query params[:text]
-			get_response send_text
-			Message.create! :text => send_text, :customer => @customer
+			send_message send_text
 		else
 			case order.order_step
 			when "sent_menu", "was_cancelled"
@@ -132,11 +131,10 @@ class WaiterController < ApplicationController
 					@@num_size.push size
 
 					main_reply = reply+". "+order_question
-					get_response main_reply
+					send_message main_reply
 					@@reply = reply.split(': ')[-1]
 					order.order_step = "asked_for_free_option"
 					order.save
-					Message.create! :customer => @customer, :text => main_reply
 				else
 					wrong_main_order_format = get_wrong_main_order_format @customer.name
 					get_response wrong_main_order_format
@@ -147,21 +145,18 @@ class WaiterController < ApplicationController
 				if is_a_pizza_code? text[0]
 					pizza_price = get_pizza_price(@@reply)
 					main_order = get_main_order text[0], @@reply, @@num_size, pizza_price
-					get_response main_order
-					Message.create! :customer => @customer, :text => main_order
+					send_message main_order
 					order.order_step = "asked_for_confirmation"
 					order.save
 				else
 					wrong_free_pizza_format = get_wrong_free_pizza_format @customer.name
-					get_response wrong_free_pizza_format
-					Message.create customer: @customer, text: wrong_free_pizza_format
+					send_message wrong_free_pizza_format
 				end
 
 			when "asked_for_confirmation"
 				if text == "yes"
 					final = get_order_question "order_complete"
-					get_response final
-					Message.create! customer: @customer, text: final
+					send_message final
 					order.order_step = "order_completed"
 					order.save
 				elsif text == "no"
@@ -170,13 +165,11 @@ class WaiterController < ApplicationController
 					order.save
 				else
 					wrong_confirmation = get_wrong_boolean_format @customer.name
-					get_response wrong_confirmation
-					Message.create! customer: @customer, text: wrong_confirmation					
+					send_message wrong_confirmation
 				end
 			when "order_completed"
 				text = "Please send the word Pizza to start another order"
-				get_response text
-				Message.create! customer: @customer, text: text
+				send_message text
 			end
 		end
 	end

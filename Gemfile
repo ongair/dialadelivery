@@ -4,6 +4,8 @@ source 'https://rubygems.org'
 gem 'rails', '4.0.0'
 
 gem 'httmultiparty'
+
+gem 'daemons'
 gem 'delayed_job_active_record'
 
 # Use sqlite3 as the database for Active Record
