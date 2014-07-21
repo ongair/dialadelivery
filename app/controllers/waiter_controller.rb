@@ -105,7 +105,7 @@ class WaiterController < ApplicationController
 		text.downcase!
 		text.delete!(' ')
 
-		if order.nil?
+		if order.nil? || order.order_step=="order_completed"
 			Surburb.create :name=>params[:text], :approved=>false
 			send_text = wrong_query params[:text]
 			get_response send_text
