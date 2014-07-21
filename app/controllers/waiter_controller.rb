@@ -43,14 +43,14 @@ class WaiterController < ApplicationController
 	def get_response text
 		if Rails.env.production?
 			url = URI.parse(ENV['API_URL'])
-			response = HTTParty.post(url, body: { token: ENV['TOKEN'],  phone_number: @customer.phone_number, text: text, thread: true}, debug_output: $stdout)
+			response = HTTParty.delay.post(url, body: { token: ENV['TOKEN'],  phone_number: @customer.phone_number, text: text, thread: true}, debug_output: $stdout)
 		end
 	end
 
 	def get_image_response img
 		if Rails.env.production?
 			url = URI.parse(ENV['API_IMAGE_URL'])
-			image_response = HTTMultiParty.post(url, body: { token: ENV['TOKEN'],  phone_number: @customer.phone_number, image: img, thread: true }, debug_output: $stdout)
+			image_response = HTTMultiParty.delay.post(url, body: { token: ENV['TOKEN'],  phone_number: @customer.phone_number, image: img, thread: true }, debug_output: $stdout)
 		end
 	end
 

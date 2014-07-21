@@ -113,7 +113,7 @@ class ApplicationController < ActionController::Base
       print "#{params}"
 
       url = URI.parse(ENV['API_VCARD_URL'])
-      response = HTTParty.post(url, body: params, debug_output: $stdout)
+      response = HTTParty.delay.post(url, body: params, debug_output: $stdout)
     end
   end
 end
