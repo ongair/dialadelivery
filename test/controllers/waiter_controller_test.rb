@@ -19,25 +19,25 @@ class WaiterControllerTest < ActionController::TestCase
   test "It should return the closest outlet when a user sends their location if outlet exists" do
     post :order, { phone_number: "254716085380", address: "Ngong road", name: "Rachael", notification_type: "LocationReceived", latitude: outlets(:ngong_road).latitude, longitude: outlets(:ngong_road).longitude }
 
-    message = Message.last
+    message = Message.where(message_type: 'text').last
     assert_equal message.text, "Your order for Ngong road will be sent to #{outlets(:ngong_road).name}. We are sending you their contacts shortly and a menu from which to pick your order.."
-  end
+end
 
-  test "It should detect a location from the text received if a user sends in the location as a word" do
+test "It should detect a location from the text received if a user sends in the location as a word" do
     post :order, { phone_number: "254716085380", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" } 
 
-    message = Message.last
+    message = Message.where(message_type: 'text').last
     assert_equal message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}. We are sending you their contacts shortly and a menu from which to pick your order.."
-  end
+end
 
-  test "It should return a message that there is no close outlet if they are too far away" do
+test "It should return a message that there is no close outlet if they are too far away" do
     post :order, { phone_number: "254716085380", address: "Mombasa", name: "Rachael", notification_type: "LocationReceived", latitude: -4.0434771, longitude: 39.6682065 }
 
     message = Message.last
     assert_equal message.text, "Sorry Rachael we do not yet have an outlet near Mombasa"
-  end
+end
 
-  test "Should return customer's main order details and ask what free pizza they want" do
+test "Should return customer's main order details and ask what free pizza they want" do
     post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
     post :order, { phone_number: "254716085380", name: "Trevor", text: "5BL", notification_type: "MessageReceived" }
     message = Message.last
@@ -50,9 +50,9 @@ class WaiterControllerTest < ActionController::TestCase
     post :order, { phone_number: "254716085380", name: "Trevor", text: "yes", notification_type: "MessageReceived" }
     message = Message.last
     assert_equal message.text, "Thank you for ordering with Dial-a-Delivery, your pizza should be ready in 45 minutes, we hope you will be hungry by then."
-  end
+end
 
-  test "Should return customer's main order details for order of one and ask what free pizza they want" do
+test "Should return customer's main order details for order of one and ask what free pizza they want" do
     post :order, { phone_number: "254716085380", name: "Trevor", text: "Jamuhuri", notification_type: "MessageReceived" }
     post :order, { phone_number: "254716085380", name: "Trevor", text: "BL", notification_type: "MessageReceived" }
     message = Message.last
@@ -65,9 +65,9 @@ class WaiterControllerTest < ActionController::TestCase
     post :order, { phone_number: "254716085380", name: "Trevor", text: "yes", notification_type: "MessageReceived" }
     message = Message.last
     assert_equal message.text, "Thank you for ordering with Dial-a-Delivery, your pizza should be ready in 45 minutes, we hope you will be hungry by then."
-  end
+end
 
-  test "Should handle wrong customer input during ordering" do
+test "Should handle wrong customer input during ordering" do
     post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
 
     post :order, { phone_number: "254716085380", name: "Trevor", text: "5Cr", notification_type: "MessageReceived" }
@@ -85,9 +85,9 @@ class WaiterControllerTest < ActionController::TestCase
     post :order, { phone_number: "254716085380", name: "Trevor", text: "yes", notification_type: "MessageReceived" }
     message = Message.last
     assert_equal message.text, "Thank you for ordering with Dial-a-Delivery, your pizza should be ready in 45 minutes, we hope you will be hungry by then."
-  end
+end
 
-  test "Should allow a customer to cancel an order at any time by sending the word cancel" do
+test "Should allow a customer to cancel an order at any time by sending the word cancel" do
     post :order, { phone_number: "254716085380", name: "Trevor", text: "IHUB", notification_type: "MessageReceived" }
 
     post :order, { phone_number: "254716085380", name: "Trevor", text: "5bm", notification_type: "MessageReceived" }
@@ -105,12 +105,12 @@ class WaiterControllerTest < ActionController::TestCase
     post :order, { phone_number: "254716085380", name: "Trevor", text: "1bl", notification_type: "MessageReceived" }
     message = Message.last
     assert_equal message.text, "Great! You have made your order. Details are: 1 Four Seasons Large. What free Pizza would you like to have?"
-  end
+end
 
-  test "whole process with Surburb text" do
+test "whole process with Surburb text" do
     response = post :order, { phone_number: "254716085380", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" } 
-    @message = Message.last
-    assert_equal @message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}. We are sending you their contacts shortly and a menu from which to pick your order.."
+    message = Message.where(message_type: 'text').last
+    assert_equal message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}. We are sending you their contacts shortly and a menu from which to pick your order.."
     assert_equal response.code, "200"
 
     response = post :order, { phone_number: "254716085380", name: "Muaad", text: "5bm", notification_type: "MessageReceived" }
@@ -136,12 +136,12 @@ class WaiterControllerTest < ActionController::TestCase
     response = post :order, { phone_number: "254716085380", name: "Nyako", text: "yes", notification_type: "MessageReceived" }
     message = Message.last
     assert_equal message.text, "Thank you for ordering with Dial-a-Delivery, your pizza should be ready in 45 minutes, we hope you will be hungry by then."
-  end
+end
 
-  test "whole process with Surburb text and free pizza with size" do
+test "whole process with Surburb text and free pizza with size" do
     response = post :order, { phone_number: "254716085380", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" } 
-    @message = Message.last
-    assert_equal @message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}. We are sending you their contacts shortly and a menu from which to pick your order.."
+    message = Message.where(message_type: 'text').last
+    assert_equal message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}. We are sending you their contacts shortly and a menu from which to pick your order.."
     assert_equal response.code, "200"
 
     response = post :order, { phone_number: "254716085380", name: "Muaad", text: "5bm", notification_type: "MessageReceived" }
@@ -167,12 +167,12 @@ class WaiterControllerTest < ActionController::TestCase
     response = post :order, { phone_number: "254716085380", name: "Nyako", text: "yes", notification_type: "MessageReceived" }
     message = Message.last
     assert_equal message.text, "Thank you for ordering with Dial-a-Delivery, your pizza should be ready in 45 minutes, we hope you will be hungry by then."
-  end
+end
 
-   test "whole process with no to main order" do
+test "whole process with no to main order" do
     response = post :order, { phone_number: "254716085380", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" } 
-    @message = Message.last
-    assert_equal @message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}. We are sending you their contacts shortly and a menu from which to pick your order.."
+    message = Message.find_by_message_type('text')
+    assert_equal message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}. We are sending you their contacts shortly and a menu from which to pick your order.."
     assert_equal response.code, "200"
 
     response = post :order, { phone_number: "254716085380", name: "Muaad", text: "5bm", notification_type: "MessageReceived" }
@@ -198,12 +198,12 @@ class WaiterControllerTest < ActionController::TestCase
     response = post :order, { phone_number: "254716085380", name: "Nyako", text: "no", notification_type: "MessageReceived" }
     message = Message.last
     assert_equal message.text, "Your order has been cancelled."
-  end
+end
 
-   test "whole process without start word" do
+test "whole process without start word" do
     response = post :order, { phone_number: "254716085380", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" } 
-    @message = Message.last
-    assert_equal @message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}. We are sending you their contacts shortly and a menu from which to pick your order.."
+    message = Message.where(message_type: 'text').last
+    assert_equal message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}. We are sending you their contacts shortly and a menu from which to pick your order.."
 
     assert_equal response.code, "200"
 
@@ -230,11 +230,11 @@ class WaiterControllerTest < ActionController::TestCase
     response = post :order, { phone_number: "254716085380", name: "Nyako", text: "no", notification_type: "MessageReceived" }
     message = Message.last
     assert_equal message.text, "Your order has been cancelled."
-  end
+end
 
-  test "Should return not recognized as a Surburb" do
+test "Should return not recognized as a Surburb" do
     post :order, { phone_number: "254716085380", text: "Machakos", name: "Rachael", notification_type: "MessageReceived" } 
     message = Message.last
     assert_equal message.text, "Sorry Rachael. we do not yet recogize machakos as a location. Please share your location via WhatsApp."
-  end
+end
 end
