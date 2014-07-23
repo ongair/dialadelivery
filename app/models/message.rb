@@ -24,18 +24,15 @@ class Message < ActiveRecord::Base
 			case message_type
 			when "text"
 				params['text'] = text
-				url_str = ENV['API_URL']+"/send"
-				url = URI.parse(url_str)
+				url = "#{ENV['API_URL']}/send"
 				response = HTTParty.post(url, body: params, debug_output: $stdout)
 			when "image"
 				params['image'] = image
-				url_str = ENV['API_URL']+"/send_image"
-				url = URI.parse(url_str)
+				url = "#{ENV['API_URL']}/send_image"
 				response = HTTMultiParty.post(url, body: params, debug_output: $stdout)
 			when "vcard"
 				params['text'] = text
-				url_str = ENV['API_URL']+"/send_contact"
-				url = URI.parse(url_str)
+				url = "#{ENV['API_URL']}/send_contact"
 				response = HTTParty.post(url, body: params, debug_output: $stdout)
 			end
 		end
