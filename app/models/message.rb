@@ -26,7 +26,7 @@ class Message < ActiveRecord::Base
 			'token' => ENV['TOKEN'],
 			'thread' => true
 		}
-		if Rails.env.production?
+		# if Rails.env.production?
 			case message_type
 			when "text"
 				params['text'] = text
@@ -41,7 +41,7 @@ class Message < ActiveRecord::Base
 				url = "#{ENV['API_URL']}/send_contact"
 				response = HTTParty.post(url, body: params, debug_output: $stdout)
 			end
-		end
+		# end
 	end
 	# handle_asynchronously :deliver
 end
