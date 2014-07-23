@@ -13,8 +13,10 @@ class Message < ActiveRecord::Base
 	belongs_to :customer
 
 	def deliver
-		url = URI.parse(ENV['API_URL'])
-		response = HTTParty.post(url, body: { token: ENV['TOKEN'],  phone_number: customer.phone_number, text: text, thread: true}, debug_output: $stdout)
+		if Rails.env.production?
+			url = URI.parse(ENV['API_URL'])
+			response = HTTParty.post(url, body: { token: ENV['TOKEN'],  phone_number: customer.phone_number, text: text, thread: true}, debug_output: $stdout)
+		end
 	end
-	handle_asynchronously :deliver
+	# handle_asynchronously :deliver
 end

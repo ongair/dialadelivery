@@ -22,8 +22,7 @@ class WaiterController < ApplicationController
 					end
 				else
 					text = wrong_query params[:text]
-					get_response text
-					Message.create! :text => text, :customer => @customer
+					send_message text
 				end
 			else
 				process_text params[:text]
@@ -41,13 +40,6 @@ class WaiterController < ApplicationController
 	def is_a_surburb? text
 		surburb = get_surburb text
 		!surburb.nil?
-	end
-
-	def get_response text
-		if Rails.env.production?
-			url = URI.parse(ENV['API_URL'])
-			response = HTTParty.post(url, body: { token: ENV['TOKEN'],  phone_number: @customer.phone_number, text: text, thread: true}, debug_output: $stdout)
-		end
 	end
 
 	def get_image_response img
@@ -137,8 +129,7 @@ class WaiterController < ApplicationController
 					order.save
 				else
 					wrong_main_order_format = get_wrong_main_order_format @customer.name
-					get_response wrong_main_order_format
-					Message.create! customer: @customer, text: wrong_main_order_format
+					send_message wrong_main_order_format
 				end
 
 			when "asked_for_free_option"
@@ -172,10 +163,6 @@ class WaiterController < ApplicationController
 				send_message text
 			end
 		end
-	end
-
-	def is_start_word? text
-		text.downcase == ENV['START'].downcase
 	end
 
 	def has_pending_orders?
