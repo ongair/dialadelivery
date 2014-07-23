@@ -32,14 +32,24 @@ class WaiterController < ApplicationController
 	end
 
 	private
-	def send_message type, whatever
+	def send_message type, whatever, params={}
 		case type
 		when "text"
 			@message = Message.create! :customer=>@customer, message_type: "text", text: whatever
 		when "image"
 			@message = Message.create! :customer=>@customer, message_type: "image", image: File.new(whatever, "r")
+		when "contact"
+			@message = Message.create! :customer=>@customer, message_type: "contact", firstname: whatever
 		end
-		@message.deliver
+		@message.deliver params
+	end
+
+	def get_contact_array outlet
+		contact_numbers = []
+		outlet.outlet_contacts.each do |number|
+			contact_numbers.push number.phone_number
+		end
+		contact_numbers
 	end
 
 	def is_a_surburb? text
@@ -63,8 +73,9 @@ class WaiterController < ApplicationController
 	end
 
 	def reply order, outlet
-		send_vcard outlet
-		send_menu
+		contact_numbers = get_contact_array outlet
+		send_message 'contact', outlet.name.gsub(',',''), :contacts=>contact_numbers
+		# send_menu
 	end
 
 	def send_menu

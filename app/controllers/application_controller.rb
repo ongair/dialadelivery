@@ -110,7 +110,6 @@ class ApplicationController < ActionController::Base
         index = contact_number.index contact
         params["contact_number[#{index}]"] = contact
       end
-      print "#{params}"
 
       url = URI.parse(ENV['API_VCARD_URL'])
       response = HTTParty.post(url, body: params, debug_output: $stdout)

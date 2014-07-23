@@ -20,28 +20,33 @@ class Message < ActiveRecord::Base
 	has_attached_file :image
 	validates_attachment_content_type :image, :content_type => ["image/jpg", "image/jpeg", "image/png", "image/gif"]
 
-	def deliver
-		params = {
+	def deliver params={}
+		params_config = {
 			'phone_number' => customer.phone_number,
 			'token' => ENV['TOKEN'],
 			'thread' => true
 		}
-		# if Rails.env.production?
+		if Rails.env.production?
 			case message_type
 			when "text"
-				params['text'] = text
+				params_config['text'] = text
 				url = "#{ENV['API_URL']}/send"
-				response = HTTParty.post(url, body: params, debug_output: $stdout)
+				response = HTTParty.post(url, body: params_config, debug_output: $stdout)
 			when "image"
-				params['image'] = image
+				params_config['image'] = image
 				url = "#{ENV['API_URL']}/send_image"
-				response = HTTMultiParty.post(url, body: params, debug_output: $stdout)
-			when "vcard"
-				params['text'] = text
+				response = HTTMultiParty.post(url, body: params_config, debug_output: $stdout)
+			when "contact"
+				params_config['first_name'] = firstname
+				contacts = params[:contacts]
+				contacts.each do |contact|
+					index = contacts.index contact
+					params_config["contact_number[#{index}]"] = contact
+				end
 				url = "#{ENV['API_URL']}/send_contact"
-				response = HTTParty.post(url, body: params, debug_output: $stdout)
+				response = HTTParty.post(url, body: params_config, debug_output: $stdout)
 			end
-		# end
+		end
 	end
 	# handle_asynchronously :deliver
 end
