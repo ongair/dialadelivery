@@ -16,13 +16,13 @@ class WaiterController < ApplicationController
 					else
 						text = get_outlet_text_for_no_order_location surburb.name, @customer.name
 					end
-					send_message text
+					send_message "text", :text=>text
 					if outlet
 						start_order outlet
 					end
 				else
 					text = wrong_query params[:text]
-					send_message text
+					send_message "text",text
 				end
 			else
 				process_text params[:text]
@@ -32,8 +32,16 @@ class WaiterController < ApplicationController
 	end
 
 	private
-	def send_message text
-		message = Message.create! :customer=>@customer, :text=>text
+	def send_message type, params
+		message = Message.create! :customer=>@customer
+		case type
+		when "text"
+			message.message_type = "text"
+			message.text = params[:text]
+			message.save
+		when "image"
+		when "contact"
+		end
 		message.deliver
 	end
 
@@ -65,6 +73,7 @@ class WaiterController < ApplicationController
 	def send_menu
 		path = Rails.root + 'app/assets/images/menu.jpg'
 		img = File.new(path)
+		# send_message "image", :image=>img
 		get_image_response img
 	end
 
@@ -77,7 +86,7 @@ class WaiterController < ApplicationController
 		else
 			text = get_outlet_text_for_no_order_location place, @customer.name
 		end
-		send_message text
+		send_message "text", :text=>text
 		if outlet
 			start_order outlet
 		end
@@ -85,7 +94,7 @@ class WaiterController < ApplicationController
 
 	def send_cancel_order_text
 		cancel_order_text = "Your order has been cancelled."
-		send_message cancel_order_text
+		send_message "text", :text=>cancel_order_text
 	end
 
 	def set_order
@@ -104,7 +113,7 @@ class WaiterController < ApplicationController
 		elsif order.nil? || order.order_step=="order_completed"
 			Surburb.create :name=>params[:text], :approved=>false
 			send_text = wrong_query params[:text]
-			send_message send_text
+			send_message "text", :text=>send_text
 		else
 			case order.order_step
 			when "sent_menu", "was_cancelled"
@@ -123,31 +132,31 @@ class WaiterController < ApplicationController
 					@@num_size.push size
 
 					main_reply = reply+". "+order_question
-					send_message main_reply
+					send_message "text", :text=>main_reply
 					@@reply = reply.split(': ')[-1]
 					order.order_step = "asked_for_free_option"
 					order.save
 				else
 					wrong_main_order_format = get_wrong_main_order_format @customer.name
-					send_message wrong_main_order_format
+					send_message "text", :text=>wrong_main_order_format
 				end
 
 			when "asked_for_free_option"
 				if is_a_pizza_code? text[0]
 					pizza_price = get_pizza_price(@@reply)
 					main_order = get_main_order text[0], @@reply, @@num_size, pizza_price
-					send_message main_order
+					send_message "text", :text=>main_order
 					order.order_step = "asked_for_confirmation"
 					order.save
 				else
 					wrong_free_pizza_format = get_wrong_free_pizza_format @customer.name
-					send_message wrong_free_pizza_format
+					send_message "text", :text=>wrong_free_pizza_format
 				end
 
 			when "asked_for_confirmation"
 				if text == "yes"
 					final = get_order_question "order_complete"
-					send_message final
+					send_message "text", :text=>final
 					order.order_step = "order_completed"
 					order.save
 				elsif text == "no"
@@ -156,11 +165,11 @@ class WaiterController < ApplicationController
 					order.save
 				else
 					wrong_confirmation = get_wrong_boolean_format @customer.name
-					send_message wrong_confirmation
+					send_message "text", :text=>wrong_confirmation
 				end
 			when "order_completed"
 				text = "Please send the word Pizza to start another order"
-				send_message text
+				send_message "text", :text=>text
 			end
 		end
 	end
