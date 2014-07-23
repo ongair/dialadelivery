@@ -7,6 +7,7 @@ gem 'httmultiparty'
 
 gem 'daemons'
 gem 'delayed_job_active_record'
+gem 'paperclip'
 
 # Use sqlite3 as the database for Active Record
 group :production do

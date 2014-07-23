@@ -37,7 +37,7 @@ class WaiterController < ApplicationController
 		when "text"
 			@message = Message.create! :customer=>@customer, message_type: "text", text: whatever
 		when "image"
-			@message = Message.create! :customer=>@customer, message_type: "image", image: whatever
+			@message = Message.create! :customer=>@customer, message_type: "image", image: File.new(whatever, "r")
 		end
 		@message.deliver
 	end
@@ -69,8 +69,8 @@ class WaiterController < ApplicationController
 
 	def send_menu
 		path = Rails.root + 'app/assets/images/menu.jpg'
-		img = File.new(path).read
-		send_message "image", img
+		# img = File.new(path).read
+		send_message "image", path
 	end
 
 	def return_location
