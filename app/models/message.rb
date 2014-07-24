@@ -35,7 +35,9 @@ class Message < ActiveRecord::Base
 			when "image"
 				# image_url = "#{ENV['BASE_URL']}#{image.url}"
 				# image_url = "#{ENV['BASE_URL']}/app/assets/images/menu.jpg"
-				params_config['image'] = image
+				path = Rails.root + 'app/assets/images/menu.jpg'
+				image_for_sending = File.new(path, "r")
+				params_config['image'] = image_for_sending
 				url = "#{ENV['API_URL']}/send_image"
 				response = HTTMultiParty.post(url, body: params_config, debug_output: $stdout)
 			when "contact"
