@@ -57,13 +57,6 @@ class WaiterController < ApplicationController
 		!surburb.nil?
 	end
 
-	def get_image_response img
-		if Rails.env.production?
-			url = URI.parse(ENV['API_IMAGE_URL'])
-			image_response = HTTMultiParty.post(url, body: { token: ENV['TOKEN'],  phone_number: @customer.phone_number, image: img, thread: true }, debug_output: $stdout)
-		end
-	end
-
 	def start_order outlet
 		order = set_order
 		if order.nil? || order.order_step == "order_completed"
@@ -75,12 +68,11 @@ class WaiterController < ApplicationController
 	def reply order, outlet
 		contact_numbers = get_contact_array outlet
 		send_message 'contact', outlet.name.gsub(',',''), :contacts=>contact_numbers
-		# send_menu
+		send_menu
 	end
 
 	def send_menu
 		path = Rails.root + 'app/assets/images/menu.jpg'
-		# img = File.new(path).read
 		send_message "image", path
 	end
 
