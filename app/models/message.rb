@@ -33,7 +33,9 @@ class Message < ActiveRecord::Base
 				url = "#{ENV['API_URL']}/send"
 				response = HTTParty.post(url, body: params_config, debug_output: $stdout)
 			when "image"
-				params_config['image'] = image
+				#{ENV['BASE_URL']}
+				image_url = "#{image.url.split('?').first}"
+				params_config['image'] = image_url
 				url = "#{ENV['API_URL']}/send_image"
 				response = HTTMultiParty.post(url, body: params_config, debug_output: $stdout)
 			when "contact"

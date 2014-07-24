@@ -59,7 +59,7 @@ class WaiterController < ApplicationController
 
 	def start_order outlet
 		order = set_order
-		if order.nil? || order.order_step == "order_completed"
+		if order.nil? || order.order_step == "order_completed" || order.order_step == "was_cancelled"
 			order = Order.create! customer_id: @customer.id, order_step: "sent_menu"
 		end
 		reply order, outlet
@@ -103,19 +103,18 @@ class WaiterController < ApplicationController
 	def process_text text
 		order = set_order
 		text.downcase!
-		text.delete!(' ')
-
 		if text == 'cancel'
 			send_cancel_order_text
 			order.order_step = "was_cancelled"
 			order.save
-		elsif order.nil? || order.order_step=="order_completed"
-			Surburb.create :name=>params[:text], :approved=>false
-			send_text = wrong_query params[:text]
+		elsif order.nil? || order.order_step=="order_completed" || order.order_step=="was_cancelled"
+			Surburb.create :name=>text, :approved=>false
+			send_text = wrong_query text
 			send_message "text", send_text
 		else
 			case order.order_step
-			when "sent_menu", "was_cancelled"
+			when "sent_menu"
+				text.delete!(' ')
 				if is_a_main_order?(text)
 					reply = "Great! You have made your order. Details are: "
 					if text[/\d/]
@@ -141,6 +140,7 @@ class WaiterController < ApplicationController
 				end
 
 			when "asked_for_free_option"
+				text.delete!(' ')
 				if is_a_pizza_code? text[0]
 					pizza_price = get_pizza_price(@@reply)
 					main_order = get_main_order text[0], @@reply, @@num_size, pizza_price

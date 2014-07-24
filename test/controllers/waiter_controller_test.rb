@@ -37,6 +37,13 @@ test "It should return a message that there is no close outlet if they are too f
     assert_equal message.text, "Sorry Rachael we do not yet have an outlet near Mombasa"
 end
 
+test "It should return a message that we don not recognize the Surburb if it's not yet in our System" do
+    post :order, { phone_number: "254716085380", text: "City Stadium", name: "Rachael", notification_type: "MessageReceived"}
+
+    message = Message.last
+    assert_equal message.text, "Sorry Rachael. we do not yet recognize city stadium as a location. Please share your location via WhatsApp."
+end
+
 test "Should return customer's main order details and ask what free pizza they want" do
     post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
     post :order, { phone_number: "254716085380", name: "Trevor", text: "5BL", notification_type: "MessageReceived" }
@@ -102,6 +109,7 @@ test "Should allow a customer to cancel an order at any time by sending the word
     message = Message.last
     assert_equal message.text, "Your order has been cancelled."
 
+	post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
     post :order, { phone_number: "254716085380", name: "Trevor", text: "1bl", notification_type: "MessageReceived" }
     message = Message.last
     assert_equal message.text, "Great! You have made your order. Details are: 1 Four Seasons Large. What free Pizza would you like to have?"
@@ -125,6 +133,7 @@ test "whole process with Surburb text" do
     message = Message.last
     assert_equal message.text, "Your order has been cancelled."
 
+	post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
     response = post :order, { phone_number: "254716085380", name: "Trevor", text: "bl", notification_type: "MessageReceived" }
     message = Message.last
     assert_equal message.text, "Great! You have made your order. Details are: One Four Seasons Large. What free Pizza would you like to have?"
@@ -156,6 +165,8 @@ test "whole process with Surburb text and free pizza with size" do
     message = Message.last
     assert_equal message.text, "Your order has been cancelled."
 
+	post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
+
     response = post :order, { phone_number: "254716085380", name: "Trevor", text: "b l", notification_type: "MessageReceived" }
     message = Message.last
     assert_equal message.text, "Great! You have made your order. Details are: One Four Seasons Large. What free Pizza would you like to have?"
@@ -186,6 +197,8 @@ test "whole process with no to main order" do
     response = post :order, { phone_number: "254716085380", name: "Trevor", text: "Cancel", notification_type: "MessageReceived" }
     message = Message.last
     assert_equal message.text, "Your order has been cancelled."
+
+	post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
 
     response = post :order, { phone_number: "254716085380", name: "Trevor", text: "b l", notification_type: "MessageReceived" }
     message = Message.last
@@ -219,6 +232,8 @@ test "whole process without start word" do
     message = Message.last
     assert_equal message.text, "Your order has been cancelled."
 
+    post :order, { phone_number: "254716085380", name: "Trevor", text: "jamuhuri", notification_type: "MessageReceived" }
+
     response = post :order, { phone_number: "254716085380", name: "Trevor", text: "b l", notification_type: "MessageReceived" }
     message = Message.last
     assert_equal message.text, "Great! You have made your order. Details are: One Four Seasons Large. What free Pizza would you like to have?"
@@ -235,6 +250,6 @@ end
 test "Should return not recognized as a Surburb" do
     post :order, { phone_number: "254716085380", text: "Machakos", name: "Rachael", notification_type: "MessageReceived" } 
     message = Message.last
-    assert_equal message.text, "Sorry Rachael. we do not yet recogize machakos as a location. Please share your location via WhatsApp."
+    assert_equal message.text, "Sorry Rachael. we do not yet recognize machakos as a location. Please share your location via WhatsApp."
 end
 end
