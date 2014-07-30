@@ -109,7 +109,7 @@ test "Should allow a customer to cancel an order at any time by sending the word
     message = Message.last
     assert_equal message.text, "Your order has been cancelled."
 
-	post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
+    post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
     post :order, { phone_number: "254716085380", name: "Trevor", text: "1bl", notification_type: "MessageReceived" }
     message = Message.last
     assert_equal message.text, "Great! You have made your order. Details are: 1 Four Seasons Large. What free Pizza would you like to have?"
@@ -133,7 +133,7 @@ test "whole process with Surburb text" do
     message = Message.last
     assert_equal message.text, "Your order has been cancelled."
 
-	post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
+    post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
     response = post :order, { phone_number: "254716085380", name: "Trevor", text: "bl", notification_type: "MessageReceived" }
     message = Message.last
     assert_equal message.text, "Great! You have made your order. Details are: One Four Seasons Large. What free Pizza would you like to have?"
@@ -165,7 +165,7 @@ test "whole process with Surburb text and free pizza with size" do
     message = Message.last
     assert_equal message.text, "Your order has been cancelled."
 
-	post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
+    post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
 
     response = post :order, { phone_number: "254716085380", name: "Trevor", text: "b l", notification_type: "MessageReceived" }
     message = Message.last
@@ -182,7 +182,7 @@ end
 
 test "whole process with no to main order" do
     response = post :order, { phone_number: "254716085380", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" } 
-    message = Message.find_by_message_type('text')
+    message = Message.where(message_type: 'text').last
     assert_equal message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}. We are sending you their contacts shortly and a menu from which to pick your order.."
     assert_equal response.code, "200"
 
@@ -198,7 +198,7 @@ test "whole process with no to main order" do
     message = Message.last
     assert_equal message.text, "Your order has been cancelled."
 
-	post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
+    post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
 
     response = post :order, { phone_number: "254716085380", name: "Trevor", text: "b l", notification_type: "MessageReceived" }
     message = Message.last
