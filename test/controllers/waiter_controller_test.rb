@@ -2,6 +2,21 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class WaiterControllerTest < ActionController::TestCase
+
+    test "It should only respond to messages after the user has received the message" do
+        post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
+
+        message = Message.where(message_type: 'text').last
+        assert_equal message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}. We are sending you their contacts shortly and a menu from which to pick your order.."
+        message.external_id = 5
+        message.save!
+
+        post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
+
+
+            
+    end
+
   test "Should register a customer if this is the first interaction" do
   	post :order, { phone_number: "254716085380", name: "Trevor", text: "Jamuhuri", notification_type: "MessageReceived" }
   	@customer = Customer.find_by_phone_number("254716085380")

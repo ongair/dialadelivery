@@ -7,7 +7,7 @@ class WaiterController < ApplicationController
 		if params[:notification_type]=="LocationReceived"
 			return_location
 		elsif params[:notification_type]=="DeliveryReceipt"
-			message = Message.last
+			message = Message.find_by(external_id: params[:id])
 			if params[:id] == message.external_id
 				@@can_proceed = true
 			end
