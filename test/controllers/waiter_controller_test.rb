@@ -324,4 +324,27 @@ class WaiterControllerTest < ActionController::TestCase
         message = Message.where(message_type: 'text').last
         assert_equal message.text, "Your order has been cancelled."
     end
+
+    test "Should cancel" do
+        post :order, { phone_number: "254716085380", text: "Jamuhuri", name: "Rachael", notification_type: "MessageReceived" } 
+        message = Message.where(message_type: 'text').last
+        message.external_id = 1
+        message.save!
+        post :order, { id: 1, notification_type: "DeliveryReceipt",name: "Rachael" }
+
+        post :order, { phone_number: "254716085380", text: "Cancel", name: "Rachael", notification_type: "MessageReceived" } 
+        message = Message.where(message_type: 'text').last
+        assert_equal message.text, "Your order has been cancelled."
+        message.external_id = 2
+        message.save!
+
+        post :order, { id: 2, notification_type: "DeliveryReceipt",name: "Rachael" }
+
+        post :order, { phone_number: "254716085380", text: "ihub", name: "Rachael", notification_type: "MessageReceived" } 
+        message = Message.where(message_type: 'text').last
+        assert_equal message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}. We are sending you their contacts shortly and a menu from which to pick your order.."
+        message.external_id = 1
+        message.save!
+
+    end
 end

@@ -13,7 +13,11 @@ class WaiterController < ApplicationController
 			end
 		else params[:notification_type]=="MessageReceived"
 			order = set_order
-			if is_a_surburb? params[:text]
+			if params[:text].downcase == 'cancel'
+				send_cancel_order_text
+				order.order_step = "was_cancelled"
+				order.save
+			elsif is_a_surburb? params[:text]
 				surburb = get_surburb params[:text]
 				if surburb.approved
 					outlet = surburb.outlet
@@ -122,69 +126,63 @@ class WaiterController < ApplicationController
 	def process_text text
 		order = set_order
 		text.downcase!
-		if text == 'cancel'
-			send_cancel_order_text
-			order.order_step = "was_cancelled"
-			order.save
-		else
-			case order.order_step
-			when "sent_menu"
-				text.delete!(' ')
-				if is_a_main_order?(text)
-					reply = "Great! You have made your order. Details are: "
-					if text[/\d/]
-						reply = reply+text[0]+' '
-						@@num_size = [text[0]]
-					else
-						reply = reply+'One '
-						@@num_size = ['One']
-					end
-					size = get_pizza_size(text[-1])
-					reply = reply+get_pizza_name(text[-2])+' '+size
-					order_question = get_order_question "free_pizza"
-					@@num_size.push size
-
-					main_reply = reply+". "+order_question
-					send_message "text", main_reply
-					@@reply = reply.split(': ')[-1]
-					order.order_step = "asked_for_free_option"
-					order.save
+		case order.order_step
+		when "sent_menu"
+			text.delete!(' ')
+			if is_a_main_order?(text)
+				reply = "Great! You have made your order. Details are: "
+				if text[/\d/]
+					reply = reply+text[0]+' '
+					@@num_size = [text[0]]
 				else
-					wrong_main_order_format = get_wrong_main_order_format @customer.name
-					send_message "text", wrong_main_order_format
+					reply = reply+'One '
+					@@num_size = ['One']
 				end
+				size = get_pizza_size(text[-1])
+				reply = reply+get_pizza_name(text[-2])+' '+size
+				order_question = get_order_question "free_pizza"
+				@@num_size.push size
 
-			when "asked_for_free_option"
-				text.delete!(' ')
-				if is_a_pizza_code? text[0]
-					pizza_price = get_pizza_price(@@reply)
-					main_order = get_main_order text[0], @@reply, @@num_size, pizza_price
-					send_message "text", main_order
-					order.order_step = "asked_for_confirmation"
-					order.save
-				else
-					wrong_free_pizza_format = get_wrong_free_pizza_format @customer.name
-					send_message "text", wrong_free_pizza_format
-				end
-
-			when "asked_for_confirmation"
-				if text == "yes"
-					final = get_order_question "order_complete"
-					send_message "text", final
-					order.order_step = "order_completed"
-					order.save
-				elsif text == "no"
-					send_cancel_order_text
-					order.order_step = "was_cancelled"
-					order.save
-				else
-					wrong_confirmation = get_wrong_boolean_format @customer.name
-					send_message "text", wrong_confirmation
-				end
-			when "order_completed"
-				text = "Please send the word Pizza to start another order"
-				send_message "text", text
+				main_reply = reply+". "+order_question
+				send_message "text", main_reply
+				@@reply = reply.split(': ')[-1]
+				order.order_step = "asked_for_free_option"
+				order.save
+			else
+				wrong_main_order_format = get_wrong_main_order_format @customer.name
+				send_message "text", wrong_main_order_format
 			end
+
+		when "asked_for_free_option"
+			text.delete!(' ')
+			if is_a_pizza_code? text[0]
+				pizza_price = get_pizza_price(@@reply)
+				main_order = get_main_order text[0], @@reply, @@num_size, pizza_price
+				send_message "text", main_order
+				order.order_step = "asked_for_confirmation"
+				order.save
+			else
+				wrong_free_pizza_format = get_wrong_free_pizza_format @customer.name
+				send_message "text", wrong_free_pizza_format
+			end
+
+		when "asked_for_confirmation"
+			if text == "yes"
+				final = get_order_question "order_complete"
+				send_message "text", final
+				order.order_step = "order_completed"
+				order.save
+			elsif text == "no"
+				send_cancel_order_text
+				order.order_step = "was_cancelled"
+				order.save
+			else
+				wrong_confirmation = get_wrong_boolean_format @customer.name
+				send_message "text", wrong_confirmation
+			end
+		when "order_completed"
+			text = "Please send the word Pizza to start another order"
+			send_message "text", text
 		end
 	end
 
