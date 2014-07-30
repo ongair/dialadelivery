@@ -12,6 +12,9 @@
 #  image_content_type :string(255)
 #  image_file_size    :integer
 #  image_updated_at   :datetime
+#  firstname          :string(255)
+#  external_id        :integer
+#  sent               :boolean
 #
 
 class Message < ActiveRecord::Base
@@ -27,11 +30,15 @@ class Message < ActiveRecord::Base
 			'thread' => true
 		}
 		if Rails.env.production?
+			sent = false
+			external_id = nil
 			case message_type
 			when "text"
 				params_config['text'] = text
 				url = "#{ENV['API_URL']}/send"
 				response = HTTParty.post(url, body: params_config, debug_output: $stdout)
+				sent = response.parsed_response["sent"]
+				external_id = response.parsed_response["id"]
 			when "image"
 				# image_url = "#{ENV['BASE_URL']}#{image.url}"
 				# image_url = "#{ENV['BASE_URL']}/app/assets/images/menu.jpg"
@@ -40,6 +47,8 @@ class Message < ActiveRecord::Base
 				params_config['image'] = image_for_sending
 				url = "#{ENV['API_URL']}/send_image"
 				response = HTTMultiParty.post(url, body: params_config, debug_output: $stdout)
+				sent = response.parsed_response["sent"]
+				external_id = response.parsed_response["id"]
 			when "contact"
 				params_config['first_name'] = firstname
 				contacts = params[:contacts]
@@ -49,7 +58,13 @@ class Message < ActiveRecord::Base
 				end
 				url = "#{ENV['API_URL']}/send_contact"
 				response = HTTParty.post(url, body: params_config, debug_output: $stdout)
+				sent = response.parsed_response["sent"]
+				external_id = response.parsed_response["id"]
 			end
+			m = Message.find(id)
+			m.sent = sent
+			m.external_id = external_id
+			m.save!
 		end
 	end
 	# handle_asynchronously :deliver

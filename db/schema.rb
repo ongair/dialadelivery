@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140723142555) do
+ActiveRecord::Schema.define(version: 20140730095218) do
 
   create_table "customers", force: true do |t|
     t.string   "name"
@@ -59,6 +59,8 @@ ActiveRecord::Schema.define(version: 20140723142555) do
     t.integer  "image_file_size"
     t.datetime "image_updated_at"
     t.string   "firstname"
+    t.integer  "external_id"
+    t.boolean  "sent"
   end
 
   add_index "messages", ["customer_id"], name: "index_messages_on_customer_id"
