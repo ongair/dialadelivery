@@ -1,15 +1,15 @@
 class WaiterController < ApplicationController
 	skip_before_action :verify_authenticity_token 
 	before_action :set_customer, only: [:order]
-	@@can_proceed = false
 
 	def order
 		if params[:notification_type]=="LocationReceived"
 			return_location
 		elsif params[:notification_type]=="DeliveryReceipt"
 			message = Message.find_by(external_id: params[:id])
-			if params[:id] == message.external_id
-				@@can_proceed = true
+			if message
+				@customer.can_proceed = true
+				@customer.save!
 			end
 		else params[:notification_type]=="MessageReceived"
 			order = set_order
@@ -30,13 +30,20 @@ class WaiterController < ApplicationController
 					text = wrong_query params[:text]
 					send_message "text", text
 				end
-			elsif @@can_proceed
-				process_text params[:text]
-				@@can_proceed = false
 			elsif order.nil? || order.order_step=="order_completed" || order.order_step=="was_cancelled"
-				Surburb.create :name=>text, :approved=>false
-				send_text = wrong_query text
+				Surburb.create :name=>params[:text], :approved=>false
+				send_text = wrong_query params[:text]
 				send_message "text", send_text
+			else
+				if @customer.can_proceed
+					process_text params[:text]
+					@customer.can_proceed = false
+					@customer.save!
+				else
+					text = ENV['WAIT_FOR_A_MESSAGE']
+					send_message "text", text
+				end
+
 			end
 
 		end

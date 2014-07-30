@@ -11,4 +11,5 @@ WELCOME_MESSAGE: 'Hallo Thank you for choosing Dial-a-Delivery'
 OUTLET_MESSAGE: 'Your nearest Dial-A-Delivery location near is'
 NO_OUTLET_MESSAGE: 'Sorry we do not yet have an outlet near'
 NO_SURBURB_MESSAGE: "Sorry Please share your location via WhatsApp"
+WAIT_FOR_A_MESSAGE: "Please wait to receive a message before proceeding"
 
