@@ -15,8 +15,8 @@ class ApplicationController < ActionController::Base
     is_a_pizza_code?(text[-2]) && is_a_pizza_size?(text[-1])
   end
 
-  def get_pizza_name code
-  	pizza = Pizza.where(Pizza.arel_table[:code].matches(code)).take.name
+  def get_pizza_row code
+  	pizza = Pizza.where(Pizza.arel_table[:code].matches(code)).take
   end
 
   def get_pizza_size size
@@ -32,25 +32,16 @@ class ApplicationController < ActionController::Base
   	order_question = OrderQuestion.where(OrderQuestion.arel_table[:order_type].matches(order_type)).take.text
   end
 
-  def get_pizza_price reply
-  	reply = reply.split
-  	if reply.length > 3
-  		reply[1] = reply.slice(1..-2).join(' ')
-  	end
-  	pizza = Pizza.where(Pizza.arel_table[:name].matches(reply[1])).take
-  	if reply[0] != "One"
-  		pizza_price = pizza.get_price(reply[-1]) * reply[0].to_i
-  	else
-  		pizza_price = pizza.get_price(reply[-1])
-  	end
-
+  def get_pizza_price order_item
+    order_item.price = order_item.pizza.get_price(order_item.size) * order_item.quantity
+    order_item.save!
   end
 
-  def get_main_order text, reply, num_size, price
+  def get_main_order text, order_item
   	main_order = "Your order details are as below, please confirm. Main Order: "
-  	main_order = main_order+reply
-  	main_order = main_order+". "+"Free Pizza: "+num_size[0]+" "+get_pizza_name(text)+" "+num_size[1]
-  	main_order = main_order+" at KES #{price}. Correct? (please reply with a yes or no)"
+  	main_order = main_order+"#{order_item.quantity} "+order_item.pizza.name+" "+order_item.size
+  	main_order = main_order+". "+"Free Pizza: "+"#{order_item.quantity} "+get_pizza_row(text).name+" "+order_item.size
+  	main_order = main_order+" at KES #{order_item.price.to_i}. Correct? (please reply with a yes or no)"
   end
 
   def get_wrong_main_order_format name

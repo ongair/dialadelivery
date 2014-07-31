@@ -122,6 +122,9 @@ class WaiterController < ApplicationController
 	def set_order
 		order = @customer.orders.last
 	end
+	def set_order_item
+		order_item = @customer.orders.last.order_items.last
+	end
 
 	def process_text text
 		order = set_order
@@ -133,19 +136,23 @@ class WaiterController < ApplicationController
 				reply = "Great! You have made your order. Details are: "
 				if text[/\d/]
 					reply = reply+text[0]+' '
-					@@num_size = [text[0]]
+					order_item = OrderItem.create! order: order, quantity: text[0].to_i 
 				else
 					reply = reply+'One '
-					@@num_size = ['One']
+					order_item = OrderItem.create! order: order, quantity: 1 
 				end
 				size = get_pizza_size(text[-1])
-				reply = reply+get_pizza_name(text[-2])+' '+size
+				pizza = get_pizza_row(text[-2])
+				order_item.pizza = pizza
+				order_item.save!
+				reply = reply+pizza.name+' '+size
 				order_question = get_order_question "free_pizza"
-				@@num_size.push size
+				order_item.size = size
+				order_item.save!
+				get_pizza_price order_item
 
 				main_reply = reply+". "+order_question
 				send_message "text", main_reply
-				@@reply = reply.split(': ')[-1]
 				order.order_step = "asked_for_free_option"
 				order.save
 			else
@@ -156,8 +163,8 @@ class WaiterController < ApplicationController
 		when "asked_for_free_option"
 			text.delete!(' ')
 			if is_a_pizza_code? text[0]
-				pizza_price = get_pizza_price(@@reply)
-				main_order = get_main_order text[0], @@reply, @@num_size, pizza_price
+				order_item = set_order_item
+				main_order = get_main_order text[0], order_item
 				send_message "text", main_order
 				order.order_step = "asked_for_confirmation"
 				order.save
