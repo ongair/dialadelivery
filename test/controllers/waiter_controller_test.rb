@@ -197,7 +197,7 @@ class WaiterControllerTest < ActionController::TestCase
 
         post :order, { phone_number: "254716085380", name: "Trevor", text: "bl", notification_type: "MessageReceived" }
         message = Message.last
-        assert_equal message.text, "Great! You have made your order. Details are: One Four Seasons Large. What free Pizza would you like to have?"
+        assert_equal message.text, "Great! You have made your order. Details are: 1 Four Seasons Large. What free Pizza would you like to have?"
 
         message.external_id = 6
         message.save!

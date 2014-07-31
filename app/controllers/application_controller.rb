@@ -7,23 +7,14 @@ class ApplicationController < ActionController::Base
     Pizza.is_a_pizza_code?(text[-2]) && Pizza.is_a_pizza_size?(text[-1])
   end
 
-  def get_pizza_size size
-  	sizes = {
-  		'r' => 'Regular',
-  		'm' => 'Medium',
-  		'l' => 'Large'
-  	}
-  	sizes[size]
-  end
-
-  def get_pizza_price order_item
+  def set_pizza_price order_item
     order_item.price = order_item.pizza.get_price(order_item.size) * order_item.quantity
     order_item.save!
   end
 
-  def get_main_order text, order_item
+  def get_main_order text, first_order, order_item
   	main_order = "Your order details are as below, please confirm. Main Order: "
-  	main_order = main_order+"#{order_item.quantity} "+order_item.pizza.name+" "+order_item.size
+  	main_order = main_order+first_order
   	main_order = main_order+". "+"Free Pizza: "+"#{order_item.quantity} "+Pizza.get_pizza_row(text).name+" "+order_item.size
   	main_order = main_order+" at KES #{order_item.price.to_i}. Correct? (please reply with a yes or no)"
   end

@@ -134,23 +134,14 @@ class WaiterController < ApplicationController
 			text.delete!(' ')
 			if is_a_main_order?(text)
 				reply = "Great! You have made your order. Details are: "
-				if text[/\d/]
-					reply = reply+text[0]+' '
-					order_item = OrderItem.create! order: order, quantity: text[0].to_i 
-				else
-					reply = reply+'One '
-					order_item = OrderItem.create! order: order, quantity: 1 
-				end
-				size = get_pizza_size(text[-1])
-				pizza = Pizza.get_pizza_row(text[-2])
-				order_item.pizza = pizza
-				order_item.save!
-				reply = reply+pizza.name+' '+size
-				order_question = OrderQuestion.get_order_question "free_pizza"
-				order_item.size = size
-				order_item.save!
-				get_pizza_price order_item
+				@@first_order = Order.get_order text
+				reply = reply + @@first_order
+				first_order = @@first_order.split
+				pizza = Pizza.find_by(name: first_order[1..-2].join(' '))
+				order_item = OrderItem.create! order: order, quantity: first_order[0], size: first_order[-1], pizza: pizza
+				set_pizza_price order_item
 
+				order_question = OrderQuestion.get_order_question "free_pizza"
 				main_reply = reply+". "+order_question
 				send_message "text", main_reply
 				order.order_step = "asked_for_free_option"
@@ -164,7 +155,7 @@ class WaiterController < ApplicationController
 			text.delete!(' ')
 			if Pizza.is_a_pizza_code? text[0]
 				order_item = set_order_item
-				main_order = get_main_order text[0], order_item
+				main_order = get_main_order text[0], @@first_order, order_item
 				send_message "text", main_order
 				order.order_step = "asked_for_confirmation"
 				order.save
