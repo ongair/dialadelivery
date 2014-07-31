@@ -3,20 +3,8 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
 
-  def is_a_pizza_code? code
-  	(Pizza.pluck :code).map(&:downcase).include? code
-  end
-
-  def is_a_pizza_size? size
-  	['r','m','l'].include? size
-  end
-
   def is_a_main_order? text
-    is_a_pizza_code?(text[-2]) && is_a_pizza_size?(text[-1])
-  end
-
-  def get_pizza_row code
-  	pizza = Pizza.where(Pizza.arel_table[:code].matches(code)).take
+    Pizza.is_a_pizza_code?(text[-2]) && Pizza.is_a_pizza_size?(text[-1])
   end
 
   def get_pizza_size size
@@ -28,10 +16,6 @@ class ApplicationController < ActionController::Base
   	sizes[size]
   end
 
-  def get_order_question order_type
-  	order_question = OrderQuestion.where(OrderQuestion.arel_table[:order_type].matches(order_type)).take.text
-  end
-
   def get_pizza_price order_item
     order_item.price = order_item.pizza.get_price(order_item.size) * order_item.quantity
     order_item.save!
@@ -40,7 +24,7 @@ class ApplicationController < ActionController::Base
   def get_main_order text, order_item
   	main_order = "Your order details are as below, please confirm. Main Order: "
   	main_order = main_order+"#{order_item.quantity} "+order_item.pizza.name+" "+order_item.size
-  	main_order = main_order+". "+"Free Pizza: "+"#{order_item.quantity} "+get_pizza_row(text).name+" "+order_item.size
+  	main_order = main_order+". "+"Free Pizza: "+"#{order_item.quantity} "+Pizza.get_pizza_row(text).name+" "+order_item.size
   	main_order = main_order+" at KES #{order_item.price.to_i}. Correct? (please reply with a yes or no)"
   end
 
@@ -64,10 +48,6 @@ class ApplicationController < ActionController::Base
 
   def get_outlet_text_for_no_order_location place, name
   	"Sorry #{name} we do not yet have an outlet near #{place}"
-  end
-
-  def get_surburb text
-    surburb = Surburb.where(Surburb.arel_table[:name].matches(text)).take
   end
 
   def return_surburb_text surburb

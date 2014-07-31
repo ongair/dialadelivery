@@ -205,7 +205,7 @@ class WaiterControllerTest < ActionController::TestCase
 
         post :order, { phone_number: "254716085380", name: "Trevor", text: "A", notification_type: "MessageReceived" }
         message = Message.last
-        assert_equal message.text, "Your order details are as below, please confirm. Main Order: One Four Seasons Large. Free Pizza: One Meat Deluxe Large at KES 1000. Correct? (please reply with a yes or no)"
+        assert_equal message.text, "Your order details are as below, please confirm. Main Order: 1 Four Seasons Large. Free Pizza: 1 Meat Deluxe Large at KES 1000. Correct? (please reply with a yes or no)"
 
         message.external_id = 7
         message.save!
@@ -255,7 +255,7 @@ class WaiterControllerTest < ActionController::TestCase
 
         post :order, { phone_number: "254716085380", name: "Trevor", text: "AL", notification_type: "MessageReceived" }
         message = Message.where(message_type: 'text').last
-        assert_equal message.text, "Your order details are as below, please confirm. Main Order: One Four Seasons Large. Free Pizza: One Meat Deluxe Large at KES 1000. Correct? (please reply with a yes or no)"
+        assert_equal message.text, "Your order details are as below, please confirm. Main Order: 1 Four Seasons Large. Free Pizza: 1 Meat Deluxe Large at KES 1000. Correct? (please reply with a yes or no)"
 
         message.external_id = 7
         message.save!
@@ -314,7 +314,7 @@ class WaiterControllerTest < ActionController::TestCase
 
         post :order, { phone_number: "254716085380", name: "Trevor", text: "AL", notification_type: "MessageReceived" }
         message = Message.where(message_type: 'text').last
-        assert_equal message.text, "Your order details are as below, please confirm. Main Order: One Four Seasons Large. Free Pizza: One Meat Deluxe Large at KES 1000. Correct? (please reply with a yes or no)"
+        assert_equal message.text, "Your order details are as below, please confirm. Main Order: 1 Four Seasons Large. Free Pizza: 1 Meat Deluxe Large at KES 1000. Correct? (please reply with a yes or no)"
 
         message.external_id = 7
         message.save!

@@ -18,7 +18,7 @@ class WaiterController < ApplicationController
 				order.order_step = "was_cancelled"
 				order.save
 			elsif is_a_surburb? params[:text]
-				surburb = get_surburb params[:text]
+				surburb = Surburb.get_surburb params[:text]
 				if surburb.approved
 					outlet = surburb.outlet
 					if outlet
@@ -76,7 +76,7 @@ class WaiterController < ApplicationController
 	end
 
 	def is_a_surburb? text
-		surburb = get_surburb text
+		surburb = Surburb.get_surburb text
 		!surburb.nil?
 	end
 
@@ -142,11 +142,11 @@ class WaiterController < ApplicationController
 					order_item = OrderItem.create! order: order, quantity: 1 
 				end
 				size = get_pizza_size(text[-1])
-				pizza = get_pizza_row(text[-2])
+				pizza = Pizza.get_pizza_row(text[-2])
 				order_item.pizza = pizza
 				order_item.save!
 				reply = reply+pizza.name+' '+size
-				order_question = get_order_question "free_pizza"
+				order_question = OrderQuestion.get_order_question "free_pizza"
 				order_item.size = size
 				order_item.save!
 				get_pizza_price order_item
@@ -162,7 +162,7 @@ class WaiterController < ApplicationController
 
 		when "asked_for_free_option"
 			text.delete!(' ')
-			if is_a_pizza_code? text[0]
+			if Pizza.is_a_pizza_code? text[0]
 				order_item = set_order_item
 				main_order = get_main_order text[0], order_item
 				send_message "text", main_order
@@ -175,7 +175,7 @@ class WaiterController < ApplicationController
 
 		when "asked_for_confirmation"
 			if text == "yes"
-				final = get_order_question "order_complete"
+				final = OrderQuestion.get_order_question "order_complete"
 				send_message "text", final
 				order.order_step = "order_completed"
 				order.save

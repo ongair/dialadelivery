@@ -11,5 +11,9 @@
 #
 
 class Surburb < ActiveRecord::Base
-  belongs_to :outlet
+	belongs_to :outlet
+
+	def self.get_surburb text
+		Surburb.where(Surburb.arel_table[:name].matches(text)).take
+	end
 end

@@ -9,7 +9,7 @@ class ContactController < ApplicationController
 		if params[:notification_type] == "LocationReceived"
 			return_location
 		elsif params[:notification_type] == "MessageReceived"
-			surburb = get_surburb params[:text]
+			surburb = Surburb.get_surburb params[:text]
 			if surburb
 				if surburb.approved
 					outlet, text = return_surburb_text surburb

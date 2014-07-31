@@ -22,4 +22,13 @@ class Pizza < ActiveRecord::Base
 			return large_price.to_i
 		end			
 	end
+	def self.get_pizza_row code
+		Pizza.where(Pizza.arel_table[:code].matches(code)).take
+	end
+	def self.is_a_pizza_code? code
+		(Pizza.pluck :code).map(&:downcase).include? code
+	end
+	def self.is_a_pizza_size? size
+		['r','m','l'].include? size
+	end
 end

@@ -10,4 +10,7 @@
 #
 
 class OrderQuestion < ActiveRecord::Base
+	def self.get_order_question order_type
+		order_question = OrderQuestion.where(OrderQuestion.arel_table[:order_type].matches(order_type)).take.text
+	end
 end
