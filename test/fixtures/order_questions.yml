@@ -62,3 +62,7 @@ twelve:
 thirteen:
   order_type: main_order
   text: Your order details are as below, please confirm. Main Order.. Free Pizza.. at KES Correct? (please reply with a yes or no)
+
+fourteen:
+  order_type: already_cancelled
+  text: You already cancelled your most recent Order

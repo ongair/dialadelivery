@@ -386,4 +386,41 @@ class WaiterControllerTest < ActionController::TestCase
         message = Message.where(message_type: 'text').last
         assert_equal message.text, "Your order details are as below, please confirm. Main Order.. 250 Hawaiian Regular. Free Pizza.. 250 Meat Deluxe Regular at KES 150000. Correct? (please reply with a yes or no)"
     end
+
+    test "Cannot cancel twice" do
+        post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
+
+        message = Message.where(message_type: 'text').last
+        message.external_id = 1
+        message.save!
+        post :order, { phone_number: "254716085380", name: "Trevor", id: 1, notification_type: "DeliveryReceipt" }
+
+        post :order, { phone_number: "254716085380", name: "Trevor", text: "25Cr", notification_type: "MessageReceived" }
+        message = Message.where(message_type: 'text').last
+        assert_equal message.text, "Great! You have made your order. Details are.. 25 Hawaiian Regular. What free Pizza would you like to have?"
+        
+        message.external_id = 2
+        message.save!
+        post :order, { id: 2, phone_number: "254716085380", name: "Trevor", notification_type: "DeliveryReceipt" }
+
+        post :order, { phone_number: "254716085380", name: "Trevor", text: "A", notification_type: "MessageReceived" }
+        message = Message.where(message_type: 'text').last
+        assert_equal message.text, "Your order details are as below, please confirm. Main Order.. 25 Hawaiian Regular. Free Pizza.. 25 Meat Deluxe Regular at KES 15000. Correct? (please reply with a yes or no)"
+
+        message.external_id = 3
+        message.save!
+        post :order, { id: 3, notification_type: "DeliveryReceipt",name: "Rachael" }
+
+        post :order, { phone_number: "254716085380", text: "Cancel", name: "Rachael", notification_type: "MessageReceived" } 
+        message = Message.where(message_type: 'text').last
+        assert_equal message.text, "Your order has been cancelled."
+        
+        message.external_id = 4
+        message.save! 
+        post :order, { id: 4, notification_type: "DeliveryReceipt",name: "Rachael" }
+
+        post :order, { phone_number: "254716085380", text: "Cancel", name: "Rachael", notification_type: "MessageReceived" } 
+        message = Message.where(message_type: 'text').last
+        assert_equal message.text, "You already cancelled your most recent Order"
+    end
 end

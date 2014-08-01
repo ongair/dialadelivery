@@ -13,10 +13,14 @@ class WaiterController < ApplicationController
 			end
 		else params[:notification_type]=="MessageReceived"
 			order = set_order
-			if params[:text].downcase == 'cancel'
-				send_cancel_order_text
-				order.order_step = "was_cancelled"
-				order.save
+			if params[:text].downcase == 'cancel' 
+				if order.order_step!="was_cancelled"
+					send_cancel_order_text
+					order.order_step = "was_cancelled"
+					order.save
+				else
+					send_message "text", OrderQuestion.get_order_question("already_cancelled")
+				end
 			elsif is_a_surburb? params[:text]
 				surburb = Surburb.get_surburb params[:text]
 				if surburb.approved
