@@ -44,7 +44,7 @@ class WaiterController < ApplicationController
 					@customer.can_proceed = false
 					@customer.save!
 				else
-					text = ENV['WAIT_FOR_A_MESSAGE']
+					text = OrderQuestion.find_by(order_type: "wait_receipt").text
 					send_message "text", text
 				end
 
@@ -115,7 +115,7 @@ class WaiterController < ApplicationController
 	end
 
 	def send_cancel_order_text
-		cancel_order_text = "Your order has been cancelled."
+		cancel_order_text = OrderQuestion.get_order_question "cancel_order"
 		send_message "text", cancel_order_text
 	end
 
@@ -133,21 +133,19 @@ class WaiterController < ApplicationController
 		when "sent_menu"
 			text.delete!(' ')
 			if is_a_main_order?(text)
-				reply = "Great! You have made your order. Details are: "
+				order_question = OrderQuestion.get_order_question "free_pizza"
 				@@first_order = Order.get_order text
-				reply = reply + @@first_order
+				order_question = order_question.gsub(/(?=\bWhat\b)/, @@first_order+". ")
 				first_order = @@first_order.split
 				pizza = Pizza.find_by(name: first_order[1..-2].join(' '))
 				order_item = OrderItem.create! order: order, quantity: first_order[0], size: first_order[-1], pizza: pizza
 				set_pizza_price order_item
 
-				order_question = OrderQuestion.get_order_question "free_pizza"
-				main_reply = reply+". "+order_question
-				send_message "text", main_reply
+				send_message "text", order_question
 				order.order_step = "asked_for_free_option"
 				order.save
 			else
-				wrong_main_order_format = get_wrong_main_order_format @customer.name
+				wrong_main_order_format = get_wrong_main_order_format
 				send_message "text", wrong_main_order_format
 			end
 
@@ -160,7 +158,7 @@ class WaiterController < ApplicationController
 				order.order_step = "asked_for_confirmation"
 				order.save
 			else
-				wrong_free_pizza_format = get_wrong_free_pizza_format @customer.name
+				wrong_free_pizza_format = get_wrong_free_pizza_format
 				send_message "text", wrong_free_pizza_format
 			end
 
@@ -175,12 +173,9 @@ class WaiterController < ApplicationController
 				order.order_step = "was_cancelled"
 				order.save
 			else
-				wrong_confirmation = get_wrong_boolean_format @customer.name
-				send_message "text", wrong_confirmation
+				wrong_boolean = get_wrong_boolean_format
+				send_message "text", wrong_boolean
 			end
-		when "order_completed"
-			text = "Please send the word Pizza to start another order"
-			send_message "text", text
 		end
 	end
 
@@ -192,7 +187,8 @@ class WaiterController < ApplicationController
 		@customer = Customer.find_by_phone_number(params[:phone_number])
 		if @customer.nil?
 			@customer = Customer.create! phone_number: params[:phone_number], name: params[:name]
-			text = ENV['WELCOME_MESSAGE'].gsub(/(?=\bThank\b)/, @customer.name+'. ')
+			text = OrderQuestion.get_order_question "welcome"
+			text = text.gsub(/(?=\bThank\b)/, @customer.name+'. ')
 			send_message "text", text
 		end
 		@customer

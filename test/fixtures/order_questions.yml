@@ -13,7 +13,7 @@
 
 one:
   order_type: free_pizza
-  text: What free Pizza would you like to have?
+  text: Great! You have made your order. Details are.. What free Pizza would you like to have?
 
 two:
   order_type: order_complete
@@ -22,3 +22,43 @@ two:
 three:
   order_type: steps_for_ordering
   text: Ordering your Pizza via Whatsapp is easy. Just follow the following 3 steps..
+
+four:
+  order_type: outlet_found
+  text: Your order for will be sent to We are sending you their contacts shortly and a menu from which to pick your order..
+
+five:
+  order_type: cancel_order
+  text: Your order has been cancelled.
+
+six:
+  order_type: outlet_not_found
+  text: Sorry we do not yet have an outlet near
+
+seven:
+  order_type: surburb_not_found
+  text: Sorry we do not yet recognize as a location. Please share your location via WhatsApp.
+
+eight:
+  order_type: wrong_boolean
+  text: Sorry wrong answer format. Please send either yes or no to confirm or deny your order
+
+nine:
+  order_type: wrong_free_pizza
+  text: Sorry wrong answer format. Please send either an A, B, C or D depending on the code of the pizza you want
+
+ten:
+  order_type: wait_receipt
+  text: Please wait to receive a message before proceeding
+
+eleven:
+  order_type: welcome
+  text: Hallo Thank you for choosing Dial-a-Delivery
+
+twelve:
+  order_type: wrong_main_order
+  text: Sorry wrong format of reply. Please start with a number then order code, either A, B, C or D then the size either R for Regular, M for Medium or L for Large
+
+thirteen:
+  order_type: main_order
+  text: Your order details are as below, please confirm. Main Order.. Free Pizza.. at KES Correct? (please reply with a yes or no)

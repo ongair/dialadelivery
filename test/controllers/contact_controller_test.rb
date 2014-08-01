@@ -24,7 +24,7 @@ class ContactControllerTest < ActionController::TestCase
 	# 	assert_equal response.code, "200"
 
 		@message = Message.last
-		assert_equal @message.text, "Your nearest Dial-A-Delivery location near Ngong road is #{outlets(:ngong_road).name}"
+		assert_equal @message.text, "Your order for Ngong road will be sent to Pizza Inn Ngong Road. We are sending you their contacts shortly and a menu from which to pick your order.."
 	end
 
 	test "It should return a message that there is no close outlet if they are too far away" do
@@ -44,7 +44,7 @@ class ContactControllerTest < ActionController::TestCase
 		response = post :begin, { phone_number: "254716085380", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" }	
 
 		@message = Message.last
-		assert_equal @message.text, "Your nearest Dial-A-Delivery location near ihub is #{outlets(:ngong_road).name}"
+		assert_equal @message.text, "Your order for ihub will be sent to Pizza Inn Ngong Road. We are sending you their contacts shortly and a menu from which to pick your order.."
 	end
 
 	test "It should save an unknown location from text to an unapproved suburb" do

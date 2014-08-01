@@ -13,68 +13,66 @@ class ApplicationController < ActionController::Base
   end
 
   def get_main_order text, first_order, order_item
-  	main_order = "Your order details are as below, please confirm. Main Order: "
-  	main_order = main_order+first_order
-  	main_order = main_order+". "+"Free Pizza: "+"#{order_item.quantity} "+Pizza.get_pizza_row(text).name+" "+order_item.size
-  	main_order = main_order+" at KES #{order_item.price.to_i}. Correct? (please reply with a yes or no)"
+    main_order = OrderQuestion.get_order_question "main_order"
+    main_order = main_order.gsub(/(?=\bFree\b)/, first_order+". ")
+    free_pizza = "#{order_item.quantity} "+Pizza.get_pizza_row(text).name+" "+order_item.size
+    main_order = main_order.gsub(/(?=\bat\b)/, free_pizza+" ")
+    main_order = main_order.gsub(/(?=\bCorrect\b)/, order_item.price.to_i.to_s+". ")
   end
 
-  def get_wrong_main_order_format name
-  	"Sorry #{name}. Wrong format of reply. Please start with a number then order code, either A, B, C or D then the size either R for Regular, M for Medium or L for Large"
-  end
+  def get_wrong_main_order_format
+   OrderQuestion.get_order_question "wrong_main_order"
+ end
 
-  def get_wrong_free_pizza_format name
-  	"Sorry #{name}. Wrong format of reply. Please send either an A, B, C or D depending on the code of the pizza you want"
-  end
+ def get_wrong_free_pizza_format
+  OrderQuestion.get_order_question "wrong_free_pizza"
+end
 
-  def get_wrong_boolean_format name
-  	"Sorry #{name}. Please send either yes or no to confirm or deny your order"
-  end
+def get_wrong_boolean_format
+ OrderQuestion.get_order_question "wrong_boolean"
+end
 
-  def get_outlet_text_for_order_location place, name
-  	text = "Your order for #{place} will be sent to #{name}. "
-    text = text+"We are sending you their contacts shortly "
-    text = text+"and a menu from which to pick your order.."
-  end
+def get_outlet_text_for_order_location place, name
+  text = OrderQuestion.get_order_question "outlet_found"
+  text = text.gsub(/(?=\bwill\b)/, place+" ")
+  text = text.gsub(/(?=\bWe\b)/, name+". ")
+end
 
-  def get_outlet_text_for_no_order_location place, name
-  	"Sorry #{name} we do not yet have an outlet near #{place}"
-  end
+def get_outlet_text_for_no_order_location place, name
+  text = OrderQuestion.get_order_question "outlet_not_found"
+  text = text.gsub(/(?=\bwe\b)/, name+" ")
+  text = text+" #{place}"
+end
 
-  def return_surburb_text surburb
-    outlet = surburb.outlet
-    text = ENV['OUTLET_MESSAGE'].gsub(/(?=\bis\b)/, surburb.name+' ')+' '+outlet.name.gsub(',','')
-    return outlet, text
-  end
+def wrong_query place
+  text = OrderQuestion.get_order_question "surburb_not_found"
+  text = text.gsub(/(?=\bwe\b)/, @customer.name+'. ')
+  text = text.gsub(/(?=\bas\b)/, place+" ")
+end
 
-  def wrong_query place
-    text = ENV['NO_SURBURB_MESSAGE'].gsub(/(?=\bwe\b)/, @customer.name+'. ')
-    text = text.gsub(/(?=\bas\b)/, place+" ")
+def send_vcard outlet
+  contact_number = []
+  outlet.outlet_contacts.each do |number|
+    contact_number.push number.phone_number
   end
+  response_vcard outlet.name.gsub(',',''), contact_number
+end
 
-  def send_vcard outlet
-    contact_number = []
-    outlet.outlet_contacts.each do |number|
-      contact_number.push number.phone_number
+def response_vcard first_name, contact_number
+  if Rails.env.production?
+    params = {
+      'phone_number' => @customer.phone_number,
+      'token' => ENV['TOKEN'],
+      'first_name' => first_name,
+      'thread' => true
+    }
+    contact_number.each do |contact|
+      index = contact_number.index contact
+      params["contact_number[#{index}]"] = contact
     end
-    response_vcard outlet.name.gsub(',',''), contact_number
-  end
 
-  def response_vcard first_name, contact_number
-    if Rails.env.production?
-      params = {
-        'phone_number' => @customer.phone_number,
-        'token' => ENV['TOKEN'],
-        'first_name' => first_name,
-        'thread' => true
-      }
-      contact_number.each do |contact|
-        index = contact_number.index contact
-        params["contact_number[#{index}]"] = contact
-      end
-
-      url = URI.parse(ENV['API_VCARD_URL'])
-      response = HTTParty.post(url, body: params, debug_output: $stdout)
-    end
+    url = URI.parse(ENV['API_VCARD_URL'])
+    response = HTTParty.post(url, body: params, debug_output: $stdout)
   end
+end
 end

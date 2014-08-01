@@ -14,7 +14,7 @@ class WaiterControllerTest < ActionController::TestCase
 
         post :order, { phone_number: "254716085380", name: "Trevor", text: "5BL", notification_type: "MessageReceived" }
         message = Message.where(message_type: 'text').last
-        assert_equal message.text, "Great! You have made your order. Details are: 5 Four Seasons Large. What free Pizza would you like to have?"
+        assert_equal message.text, "Great! You have made your order. Details are.. 5 Four Seasons Large. What free Pizza would you like to have?"
 
         message.external_id = 2
         message.save!
@@ -22,7 +22,7 @@ class WaiterControllerTest < ActionController::TestCase
 
         post :order, { phone_number: "254716085380", name: "Trevor", text: "A", notification_type: "MessageReceived" }
         message = Message.where(message_type: 'text').last
-        assert_equal message.text, "Your order details are as below, please confirm. Main Order: 5 Four Seasons Large. Free Pizza: 5 Meat Deluxe Large at KES 5000. Correct? (please reply with a yes or no)"
+        assert_equal message.text, "Your order details are as below, please confirm. Main Order.. 5 Four Seasons Large. Free Pizza.. 5 Meat Deluxe Large at KES 5000. Correct? (please reply with a yes or no)"
 
         message.external_id = 3
         message.save!
@@ -85,7 +85,7 @@ class WaiterControllerTest < ActionController::TestCase
 
         post :order, { phone_number: "254716085380", name: "Trevor", text: "5Cr", notification_type: "MessageReceived" }
         message = Message.where(message_type: 'text').last
-        assert_equal message.text, "Great! You have made your order. Details are: 5 Hawaiian Regular. What free Pizza would you like to have?"
+        assert_equal message.text, "Great! You have made your order. Details are.. 5 Hawaiian Regular. What free Pizza would you like to have?"
 
         message.external_id = 2
         message.save!
@@ -93,7 +93,7 @@ class WaiterControllerTest < ActionController::TestCase
 
         post :order, { phone_number: "254716085380", name: "Trevor", text: "x", notification_type: "MessageReceived" }
         message = Message.where(message_type: 'text').last
-        assert_equal message.text, "Sorry Trevor. Wrong format of reply. Please send either an A, B, C or D depending on the code of the pizza you want"
+        assert_equal message.text, "Sorry wrong answer format. Please send either an A, B, C or D depending on the code of the pizza you want"
 
         message.external_id = 3
         message.save!
@@ -101,7 +101,7 @@ class WaiterControllerTest < ActionController::TestCase
 
         post :order, { phone_number: "254716085380", name: "Trevor", text: "A", notification_type: "MessageReceived" }
         message = Message.where(message_type: 'text').last
-        assert_equal message.text, "Your order details are as below, please confirm. Main Order: 5 Hawaiian Regular. Free Pizza: 5 Meat Deluxe Regular at KES 3000. Correct? (please reply with a yes or no)"
+        assert_equal message.text, "Your order details are as below, please confirm. Main Order.. 5 Hawaiian Regular. Free Pizza.. 5 Meat Deluxe Regular at KES 3000. Correct? (please reply with a yes or no)"
 
         message.external_id = 4
         message.save!
@@ -122,7 +122,7 @@ class WaiterControllerTest < ActionController::TestCase
 
         post :order, { phone_number: "254716085380", name: "Trevor", text: "5bm", notification_type: "MessageReceived" }
         message = Message.where(message_type: 'text').last
-        assert_equal message.text, "Great! You have made your order. Details are: 5 Four Seasons Medium. What free Pizza would you like to have?"
+        assert_equal message.text, "Great! You have made your order. Details are.. 5 Four Seasons Medium. What free Pizza would you like to have?"
 
         message.external_id = 2
         message.save!
@@ -130,7 +130,7 @@ class WaiterControllerTest < ActionController::TestCase
 
         post :order, { phone_number: "254716085380", name: "Trevor", text: "x", notification_type: "MessageReceived" }
         message = Message.where(message_type: 'text').last
-        assert_equal message.text, "Sorry Trevor. Wrong format of reply. Please send either an A, B, C or D depending on the code of the pizza you want"
+        assert_equal message.text, "Sorry wrong answer format. Please send either an A, B, C or D depending on the code of the pizza you want"
 
         message.external_id = 3
         message.save!
@@ -152,7 +152,7 @@ class WaiterControllerTest < ActionController::TestCase
 
         post :order, { phone_number: "254716085380", name: "Trevor", text: "1bl", notification_type: "MessageReceived" }
         message = Message.where(message_type: 'text').last
-        assert_equal message.text, "Great! You have made your order. Details are: 1 Four Seasons Large. What free Pizza would you like to have?"
+        assert_equal message.text, "Great! You have made your order. Details are.. 1 Four Seasons Large. What free Pizza would you like to have?"
     end
 
     test "whole process with Surburb text" do
@@ -166,7 +166,7 @@ class WaiterControllerTest < ActionController::TestCase
 
         post :order, { phone_number: "254716085380", name: "Muaad", text: "5bm", notification_type: "MessageReceived" }
         message = Message.where(message_type: 'text').last
-        assert_equal message.text, "Great! You have made your order. Details are: 5 Four Seasons Medium. What free Pizza would you like to have?"
+        assert_equal message.text, "Great! You have made your order. Details are.. 5 Four Seasons Medium. What free Pizza would you like to have?"
 
         message.external_id = 2
         message.save!
@@ -174,7 +174,7 @@ class WaiterControllerTest < ActionController::TestCase
 
         post :order, { phone_number: "254716085380", name: "Cynthia", text: "x", notification_type: "MessageReceived" }
         message = Message.where(message_type: 'text').last
-        assert_equal message.text, "Sorry Rachael. Wrong format of reply. Please send either an A, B, C or D depending on the code of the pizza you want"
+        assert_equal message.text, "Sorry wrong answer format. Please send either an A, B, C or D depending on the code of the pizza you want"
 
         message.external_id = 3
         message.save!
@@ -197,7 +197,7 @@ class WaiterControllerTest < ActionController::TestCase
 
         post :order, { phone_number: "254716085380", name: "Trevor", text: "bl", notification_type: "MessageReceived" }
         message = Message.last
-        assert_equal message.text, "Great! You have made your order. Details are: 1 Four Seasons Large. What free Pizza would you like to have?"
+        assert_equal message.text, "Great! You have made your order. Details are.. 1 Four Seasons Large. What free Pizza would you like to have?"
 
         message.external_id = 6
         message.save!
@@ -205,7 +205,7 @@ class WaiterControllerTest < ActionController::TestCase
 
         post :order, { phone_number: "254716085380", name: "Trevor", text: "A", notification_type: "MessageReceived" }
         message = Message.last
-        assert_equal message.text, "Your order details are as below, please confirm. Main Order: 1 Four Seasons Large. Free Pizza: 1 Meat Deluxe Large at KES 1000. Correct? (please reply with a yes or no)"
+        assert_equal message.text, "Your order details are as below, please confirm. Main Order.. 1 Four Seasons Large. Free Pizza.. 1 Meat Deluxe Large at KES 1000. Correct? (please reply with a yes or no)"
 
         message.external_id = 7
         message.save!
@@ -255,15 +255,15 @@ class WaiterControllerTest < ActionController::TestCase
 
         post :order, { phone_number: "254716085380", name: "Trevor", text: "AL", notification_type: "MessageReceived" }
         message = Message.where(message_type: 'text').last
-        assert_equal message.text, "Your order details are as below, please confirm. Main Order: 1 Four Seasons Large. Free Pizza: 1 Meat Deluxe Large at KES 1000. Correct? (please reply with a yes or no)"
+        assert_equal message.text, "Your order details are as below, please confirm. Main Order.. 1 Four Seasons Large. Free Pizza.. 1 Meat Deluxe Large at KES 1000. Correct? (please reply with a yes or no)"
 
         message.external_id = 7
         message.save!
         post :order, { id: 7, phone_number: "254716085380", name: "Trevor", notification_type: "DeliveryReceipt" }
 
-        post :order, { phone_number: "254716085380", name: "Nyako", text: "no", notification_type: "MessageReceived" }
+        post :order, { phone_number: "254716085380", name: "Nyako", text: "nope", notification_type: "MessageReceived" }
         message = Message.where(message_type: 'text').last
-        assert_equal message.text, "Your order has been cancelled."
+        assert_equal message.text, "Sorry wrong answer format. Please send either yes or no to confirm or deny your order"
         message = Message.last
     end
 
@@ -283,7 +283,7 @@ class WaiterControllerTest < ActionController::TestCase
 
         post :order, { phone_number: "254716085380", name: "Muaad", text: "5cr", notification_type: "MessageReceived" }
         message = Message.where(message_type: 'text').last
-        assert_equal message.text, "Great! You have made your order. Details are: 5 Hawaiian Regular. What free Pizza would you like to have?"
+        assert_equal message.text, "Great! You have made your order. Details are.. 5 Hawaiian Regular. What free Pizza would you like to have?"
 
         message.external_id = 3
         message.save!
@@ -314,7 +314,7 @@ class WaiterControllerTest < ActionController::TestCase
 
         post :order, { phone_number: "254716085380", name: "Trevor", text: "AL", notification_type: "MessageReceived" }
         message = Message.where(message_type: 'text').last
-        assert_equal message.text, "Your order details are as below, please confirm. Main Order: 1 Four Seasons Large. Free Pizza: 1 Meat Deluxe Large at KES 1000. Correct? (please reply with a yes or no)"
+        assert_equal message.text, "Your order details are as below, please confirm. Main Order.. 1 Four Seasons Large. Free Pizza.. 1 Meat Deluxe Large at KES 1000. Correct? (please reply with a yes or no)"
 
         message.external_id = 7
         message.save!
@@ -345,6 +345,47 @@ class WaiterControllerTest < ActionController::TestCase
         assert_equal message.text, "Your order for ihub will be sent to #{outlets(:ngong_road).name}. We are sending you their contacts shortly and a menu from which to pick your order.."
         message.external_id = 1
         message.save!
+    end
+    test "Should handle double digit requests" do
+        post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
+
+        message = Message.where(message_type: 'text').last
+        message.external_id = 1
+        message.save!
+        post :order, { phone_number: "254716085380", name: "Trevor", id: 1, notification_type: "DeliveryReceipt" }
+
+        post :order, { phone_number: "254716085380", name: "Trevor", text: "25Cr", notification_type: "MessageReceived" }
+        message = Message.where(message_type: 'text').last
+        assert_equal message.text, "Great! You have made your order. Details are.. 25 Hawaiian Regular. What free Pizza would you like to have?"
+        
+        message.external_id = 2
+        message.save!
+        post :order, { id: 2, phone_number: "254716085380", name: "Trevor", notification_type: "DeliveryReceipt" }
+
+        post :order, { phone_number: "254716085380", name: "Trevor", text: "A", notification_type: "MessageReceived" }
+        message = Message.where(message_type: 'text').last
+        assert_equal message.text, "Your order details are as below, please confirm. Main Order.. 25 Hawaiian Regular. Free Pizza.. 25 Meat Deluxe Regular at KES 15000. Correct? (please reply with a yes or no)"
+
+    end
+    test "Should handle triple digit requests" do
+        post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
+
+        message = Message.where(message_type: 'text').last
+        message.external_id = 1
+        message.save!
+        post :order, { phone_number: "254716085380", name: "Trevor", id: 1, notification_type: "DeliveryReceipt" }
+
+        post :order, { phone_number: "254716085380", name: "Trevor", text: "250Cr", notification_type: "MessageReceived" }
+        message = Message.where(message_type: 'text').last
+        assert_equal message.text, "Great! You have made your order. Details are.. 250 Hawaiian Regular. What free Pizza would you like to have?"
+        
+        message.external_id = 2
+        message.save!
+        post :order, { id: 2, phone_number: "254716085380", name: "Trevor", notification_type: "DeliveryReceipt" }
+
+        post :order, { phone_number: "254716085380", name: "Trevor", text: "A", notification_type: "MessageReceived" }
+        message = Message.where(message_type: 'text').last
+        assert_equal message.text, "Your order details are as below, please confirm. Main Order.. 250 Hawaiian Regular. Free Pizza.. 250 Meat Deluxe Regular at KES 150000. Correct? (please reply with a yes or no)"
 
     end
 end

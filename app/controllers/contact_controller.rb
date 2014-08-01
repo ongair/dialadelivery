@@ -12,9 +12,9 @@ class ContactController < ApplicationController
 			surburb = Surburb.get_surburb params[:text]
 			if surburb
 				if surburb.approved
-					outlet, text = return_surburb_text surburb
+					text = get_outlet_text_for_order_location surburb.name, surburb.outlet.name
 					get_response text
-					send_vcard outlet
+					send_vcard surburb.outlet
 					Message.create! :customer=>@customer, :text=>text
 				else
 					text = wrong_query params[:text]
@@ -51,9 +51,9 @@ class ContactController < ApplicationController
 		outlet = Outlet.find_nearest location
 		
 		if outlet
-			text = ENV['OUTLET_MESSAGE'].gsub(/(?=\bis\b)/, place+' ')+' '+outlet.name.gsub(',','')
+			text = get_outlet_text_for_order_location place, outlet.name
 		else
-			text = ENV['NO_OUTLET_MESSAGE'].gsub(/(?=\bwe\b)/, @customer.name+' ')+' '+place
+			text = get_outlet_text_for_no_order_location place, @customer.name
 		end
 
 		get_response text
@@ -67,7 +67,8 @@ class ContactController < ApplicationController
 		@customer = Customer.find_by_name_and_phone_number(params[:name], params[:phone_number])
 		if @customer.nil?
 			@customer = Customer.create! phone_number: params[:phone_number], name: params[:name]
-			text = ENV['WELCOME_MESSAGE'].gsub(/(?=\bThank\b)/, @customer.name+'. ')
+			text = OrderQuestion.find_by(order_type: "welcome").text
+			text = text.gsub(/(?=\bThank\b)/, @customer.name+'. ')
 			get_response text
 			Message.create! :text=>text, :customer=>@customer
 		end
