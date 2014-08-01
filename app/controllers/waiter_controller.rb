@@ -47,9 +47,7 @@ class WaiterController < ApplicationController
 					text = OrderQuestion.find_by(order_type: "wait_receipt").text
 					send_message "text", text
 				end
-
 			end
-
 		end
 		render json: { success: true }
 	end
@@ -148,7 +146,6 @@ class WaiterController < ApplicationController
 				wrong_main_order_format = get_wrong_main_order_format
 				send_message "text", wrong_main_order_format
 			end
-
 		when "asked_for_free_option"
 			text.delete!(' ')
 			if Pizza.is_a_pizza_code? text[0]
@@ -161,7 +158,6 @@ class WaiterController < ApplicationController
 				wrong_free_pizza_format = get_wrong_free_pizza_format
 				send_message "text", wrong_free_pizza_format
 			end
-
 		when "asked_for_confirmation"
 			if text == "yes"
 				final = OrderQuestion.get_order_question "order_complete"

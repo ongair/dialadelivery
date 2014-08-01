@@ -2,7 +2,6 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class WaiterControllerTest < ActionController::TestCase
-
     test "It should only respond to messages after the user has received the message" do
         post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
         message = Message.where(message_type: 'text').last
@@ -31,7 +30,6 @@ class WaiterControllerTest < ActionController::TestCase
         post :order, { phone_number: "254716085380", name: "Trevor", text: "yes", notification_type: "MessageReceived" }
         message = Message.where(message_type: 'text').last
         assert_equal message.text, "Thank you for ordering with Dial-a-Delivery, your pizza should be ready in 45 minutes, we hope you will be hungry by then."
-
     end
 
     test "Should register a customer if this is the first interaction" do
@@ -346,6 +344,7 @@ class WaiterControllerTest < ActionController::TestCase
         message.external_id = 1
         message.save!
     end
+
     test "Should handle double digit requests" do
         post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
 
@@ -365,8 +364,8 @@ class WaiterControllerTest < ActionController::TestCase
         post :order, { phone_number: "254716085380", name: "Trevor", text: "A", notification_type: "MessageReceived" }
         message = Message.where(message_type: 'text').last
         assert_equal message.text, "Your order details are as below, please confirm. Main Order.. 25 Hawaiian Regular. Free Pizza.. 25 Meat Deluxe Regular at KES 15000. Correct? (please reply with a yes or no)"
-
     end
+
     test "Should handle triple digit requests" do
         post :order, { phone_number: "254716085380", name: "Trevor", text: "ihub", notification_type: "MessageReceived" }
 
@@ -386,6 +385,5 @@ class WaiterControllerTest < ActionController::TestCase
         post :order, { phone_number: "254716085380", name: "Trevor", text: "A", notification_type: "MessageReceived" }
         message = Message.where(message_type: 'text').last
         assert_equal message.text, "Your order details are as below, please confirm. Main Order.. 250 Hawaiian Regular. Free Pizza.. 250 Meat Deluxe Regular at KES 150000. Correct? (please reply with a yes or no)"
-
     end
 end

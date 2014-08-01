@@ -21,58 +21,57 @@ class ApplicationController < ActionController::Base
   end
 
   def get_wrong_main_order_format
-   OrderQuestion.get_order_question "wrong_main_order"
- end
-
- def get_wrong_free_pizza_format
-  OrderQuestion.get_order_question "wrong_free_pizza"
-end
-
-def get_wrong_boolean_format
- OrderQuestion.get_order_question "wrong_boolean"
-end
-
-def get_outlet_text_for_order_location place, name
-  text = OrderQuestion.get_order_question "outlet_found"
-  text = text.gsub(/(?=\bwill\b)/, place+" ")
-  text = text.gsub(/(?=\bWe\b)/, name+". ")
-end
-
-def get_outlet_text_for_no_order_location place, name
-  text = OrderQuestion.get_order_question "outlet_not_found"
-  text = text.gsub(/(?=\bwe\b)/, name+" ")
-  text = text+" #{place}"
-end
-
-def wrong_query place
-  text = OrderQuestion.get_order_question "surburb_not_found"
-  text = text.gsub(/(?=\bwe\b)/, @customer.name+'. ')
-  text = text.gsub(/(?=\bas\b)/, place+" ")
-end
-
-def send_vcard outlet
-  contact_number = []
-  outlet.outlet_contacts.each do |number|
-    contact_number.push number.phone_number
+    OrderQuestion.get_order_question "wrong_main_order"
   end
-  response_vcard outlet.name.gsub(',',''), contact_number
-end
 
-def response_vcard first_name, contact_number
-  if Rails.env.production?
-    params = {
-      'phone_number' => @customer.phone_number,
-      'token' => ENV['TOKEN'],
-      'first_name' => first_name,
-      'thread' => true
-    }
-    contact_number.each do |contact|
-      index = contact_number.index contact
-      params["contact_number[#{index}]"] = contact
+  def get_wrong_free_pizza_format
+    OrderQuestion.get_order_question "wrong_free_pizza"
+  end
+
+  def get_wrong_boolean_format
+    OrderQuestion.get_order_question "wrong_boolean"
+  end
+
+  def get_outlet_text_for_order_location place, name
+    text = OrderQuestion.get_order_question "outlet_found"
+    text = text.gsub(/(?=\bwill\b)/, place+" ")
+    text = text.gsub(/(?=\bWe\b)/, name+". ")
+  end
+
+  def get_outlet_text_for_no_order_location place, name
+    text = OrderQuestion.get_order_question "outlet_not_found"
+    text = text.gsub(/(?=\bwe\b)/, name+" ")
+    text = text+" #{place}"
+  end
+
+  def wrong_query place
+    text = OrderQuestion.get_order_question "surburb_not_found"
+    text = text.gsub(/(?=\bwe\b)/, @customer.name+'. ')
+    text = text.gsub(/(?=\bas\b)/, place+" ")
+  end
+
+  def send_vcard outlet
+    contact_number = []
+    outlet.outlet_contacts.each do |number|
+      contact_number.push number.phone_number
     end
-
-    url = URI.parse(ENV['API_VCARD_URL'])
-    response = HTTParty.post(url, body: params, debug_output: $stdout)
+    response_vcard outlet.name.gsub(',',''), contact_number
   end
-end
+
+  def response_vcard first_name, contact_number
+    if Rails.env.production?
+      params = {
+        'phone_number' => @customer.phone_number,
+        'token' => ENV['TOKEN'],
+        'first_name' => first_name,
+        'thread' => true
+      }
+      contact_number.each do |contact|
+        index = contact_number.index contact
+        params["contact_number[#{index}]"] = contact
+      end
+      url = URI.parse(ENV['API_VCARD_URL'])
+      response = HTTParty.post(url, body: params, debug_output: $stdout)
+    end
+  end
 end
