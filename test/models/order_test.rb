@@ -18,12 +18,18 @@ class OrderTest < ActiveSupport::TestCase
 	test "Should get the correct number of pizzas" do  	
 		str = "2BL"
 		result = Order.get_order str
-
 		assert_equal "2 Four Seasons Large", result
 
 		str = "BL"
 		result2 = Order.get_order str
-
 		assert_equal "1 Four Seasons Large", result2
+
+		str = "20BL"
+		result3 = Order.get_order str
+		assert_equal "20 Four Seasons Large", result3
+
+		str = "240BL"
+		result3 = Order.get_order str
+		assert_equal "240 Four Seasons Large", result3
 	end
 end

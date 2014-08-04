@@ -65,4 +65,4 @@ thirteen:
 
 fourteen:
   order_type: already_cancelled
-  text: You already cancelled your most recent Order
+  text: You already cancelled your most recent order. Start another order by sending your current location.
