@@ -20,9 +20,9 @@
 class Message < ActiveRecord::Base
 	belongs_to :customer
 
-	def deliver
+	def deliver params={}
 		if Rails.env.production?
-			params = {
+			params_config = {
 				'phone_number' => customer.phone_number,
 				'token' => ENV['TOKEN'],
 				'text' => text
@@ -30,7 +30,15 @@ class Message < ActiveRecord::Base
 			case message_type
 			when 'text'
 				url = "#{ENV['API_URL']}/send"
-				response = HTTParty.post(url,body: params, debug_output: $stdout)
+				response = HTTParty.post(url,body: params_config, debug_output: $stdout)
+			when 'contact'
+				url = "#{ENV['API_URL']}/send_contact"
+				contacts = params[:contacts]
+				contacts.each do |contact|
+					index = contacts.index contact
+					params_config["contact_number[#{index}]"] = contact
+				end
+				response = HTTParty.post(url,body: params_config, debug_output: $stdout)
 			end
 		end
 	end

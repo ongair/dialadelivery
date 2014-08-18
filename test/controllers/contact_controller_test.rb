@@ -35,7 +35,7 @@ class ContactControllerTest < ActionController::TestCase
 	test "It should return the closest outlet when a user sends their location" do
 		post :begin, { phone_number: "254716085380", address: "Ngong road", name: "Rachael", notification_type: "LocationReceived", latitude: outlets(:ngong_road).latitude, longitude: outlets(:ngong_road).longitude }
 
-		message = Message.last
+		message = Message.all[-2]
 		assert_equal message.text, "Your nearest Dial-a-Delivery location near Ngong road is #{outlets(:ngong_road).name}. We are sending you their contacts shortly."
 	end
 

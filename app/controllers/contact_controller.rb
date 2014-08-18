@@ -30,13 +30,22 @@ class ContactController < ApplicationController
 
 	private
 
-	def send_message text, place="", outlet=""
-		m = get_order_question text, place, outlet
+	def send_message text, place="", outlet="", params={}
 		if text.downcase != 'contact'
+			m = get_order_question text, place, outlet
 			message = Message.create! text: m, message_type: 'text', customer: @customer
 		else
+			message = Message.create! customer: @customer, message_type: 'contact'
 		end
-		message.deliver
+		message.deliver params
+	end
+
+	def get_contact_array outlet
+		contact_numbers = []
+		outlet.outlet_contacts.each do |number|
+			contact_numbers.push number.phone_number
+		end
+		contact_numbers
 	end
 
 	def response_vcard first_name, contact_number
@@ -69,7 +78,8 @@ class ContactController < ApplicationController
 			send_message 'location_no_outlet', params[:address]
 		end
 		if outlet
-			send_vcard outlet
+			contact_numbers = get_contact_array outlet
+			send_message 'contact', contacts: contact_numbers
 		end
 	end
 
