@@ -29,7 +29,7 @@ class Message < ActiveRecord::Base
 			}
 			case message_type
 			when 'text'
-				url = "#{ENV['API_URL']}+/send"
+				url = "#{ENV['API_URL']}/send"
 				response = HTTParty.post(url,body: params, debug_output: $stdout)
 			end
 		end

@@ -31,7 +31,7 @@ class ContactController < ApplicationController
 	def send_message text, place="", outlet=""
 		m = get_order_question text, place, outlet
 		if text.downcase != 'contact'
-			message = Message.create! :text=>m, :customer=>@customer, message_type: 'text'
+			message = Message.create! text: m, message_type: 'text', customer: @customer
 		else
 		end
 		message.deliver

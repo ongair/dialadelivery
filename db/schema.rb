@@ -11,14 +11,31 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140714134052) do
+ActiveRecord::Schema.define(version: 20140730113905) do
 
   create_table "customers", force: true do |t|
     t.string   "name"
     t.string   "phone_number"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "can_proceed"
   end
+
+  create_table "delayed_jobs", force: true do |t|
+    t.integer  "priority",   default: 0, null: false
+    t.integer  "attempts",   default: 0, null: false
+    t.text     "handler",                null: false
+    t.text     "last_error"
+    t.datetime "run_at"
+    t.datetime "locked_at"
+    t.datetime "failed_at"
+    t.string   "locked_by"
+    t.string   "queue"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "delayed_jobs", ["priority", "run_at"], name: "delayed_jobs_priority"
 
   create_table "locations", force: true do |t|
     t.integer  "customer_id"
@@ -37,6 +54,14 @@ ActiveRecord::Schema.define(version: 20140714134052) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "customer_id"
+    t.string   "message_type"
+    t.string   "image_file_name"
+    t.string   "image_content_type"
+    t.integer  "image_file_size"
+    t.datetime "image_updated_at"
+    t.string   "firstname"
+    t.integer  "external_id"
+    t.boolean  "sent"
   end
 
   add_index "messages", ["customer_id"], name: "index_messages_on_customer_id"
