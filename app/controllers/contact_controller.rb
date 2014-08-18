@@ -7,7 +7,7 @@ class ContactController < ApplicationController
 
 	def begin
 		if params[:notification_type] == "LocationReceived"
-			return_location
+			process_location
 		elsif params[:notification_type] == "MessageReceived"
 			if params[:text].downcase == ENV['BEGIN'].downcase
 				send_message 'welcome'
@@ -28,6 +28,8 @@ class ContactController < ApplicationController
 		render json: { success: true }
 	end
 
+	private
+
 	def send_message text, place="", outlet=""
 		m = get_order_question text, place, outlet
 		if text.downcase != 'contact'
@@ -37,7 +39,6 @@ class ContactController < ApplicationController
 		message.deliver
 	end
 
-	private
 	def response_vcard first_name, contact_number
 		if Rails.env.production?
 			params = {
@@ -58,7 +59,7 @@ class ContactController < ApplicationController
 		surburb = Surburb.where(Surburb.arel_table[:name].matches(text)).take
 	end
 
-	def return_location
+	def process_location
 		location = Location.create! :name => params[:address], :latitude => params[:latitude], :longitude => params[:longitude], :customer => @customer
 		outlet = Outlet.find_nearest location
 		
