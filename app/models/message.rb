@@ -15,7 +15,7 @@ class Message < ActiveRecord::Base
 	def deliver
 		if Rails.env.production?
 			params = {
-				'phone_number' => @customer.phone_number,
+				'phone_number' => customer.phone_number,
 				'token' => ENV['TOKEN'],
 				'text' => text
 			}
