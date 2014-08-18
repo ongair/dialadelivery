@@ -9,7 +9,7 @@ class ContactController < ApplicationController
 		if params[:notification_type] == "LocationReceived"
 			return_location
 		elsif params[:notification_type] == "MessageReceived"
-			if params[:text] == ENV['BEGIN']
+			if params[:text].downcase == ENV['BEGIN'].downcase
 				send_message 'welcome'
 			else
 				surburb = get_surburb params[:text]

@@ -19,7 +19,7 @@ class Message < ActiveRecord::Base
 				'token' => ENV['TOKEN'],
 				'text' => text
 			}
-			url = EVN['API_URL']
+			url = ENV['API_URL']
 			response = HttParty.post(url,body: params, debug_output: $stdout)
 		end
 	end
