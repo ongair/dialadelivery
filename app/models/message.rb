@@ -10,5 +10,17 @@
 #
 
 class Message < ActiveRecord::Base
-  belongs_to :customer
+	belongs_to :customer
+
+	def deliver
+		if Rails.env.production?
+			params = {
+				'phone_number' => @customer.phone_number,
+				'token' => ENV['TOKEN'],
+				'text' => text
+			}
+			url = EVN['API_URL']
+			response = HttParty.post(url,body: params, debug_output: $stdout)
+		end
+	end
 end

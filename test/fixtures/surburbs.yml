@@ -15,6 +15,7 @@
 one:
   name: ihub
   outlet_id: 500320549
+  approved: true
 
 two:
   name: jamuhuri

@@ -9,35 +9,32 @@ class ContactController < ApplicationController
 		if params[:notification_type] == "LocationReceived"
 			return_location
 		elsif params[:notification_type] == "MessageReceived"
-			surburb = get_surburb params[:text]
-			if surburb
-				if surburb.approved
-					return_surburb surburb
-				else
-					wrong_query
-				end
+			if params[:text] == ENV['BEGIN']
+				send_message 'welcome'
 			else
-				Surburb.create :name=>params[:text], :approved=>false
-				wrong_query
+				surburb = get_surburb params[:text]
+				if surburb
+					if surburb.approved
+						send_message 'location_and_outlet', surburb.name, surburb.outlet
+					else
+						send_message 'no_surburb', surburb.name
+					end
+				else
+					Surburb.create :name=>params[:text], :approved=>false
+					send_message 'no_surburb', params[:text]
+				end
 			end
 		end
 		render json: { success: true }
 	end
 
-	private
-	def get_response text
-		if Rails.env.production?
-			params = {
-				'phone_number' => @customer.phone_number,
-				'token' => ENV['TOKEN'],
-				'text' => text
-			}
-
-			url = URI.parse(ENV['API_URL'])
-			response = Net::HTTP.post_form(url, params)
-		end
+	def send_message text, place="", outlet=""
+		m = get_order_question text, place, outlet
+		message = Message.create! :text=>m, :customer=>@customer
+		message.deliver
 	end
 
+	private
 	def response_vcard first_name, contact_number
 		if Rails.env.production?
 			params = {
@@ -59,31 +56,27 @@ class ContactController < ApplicationController
 	end
 
 	def return_location
-		place = params[:address]
 		location = Location.create! :name => params[:address], :latitude => params[:latitude], :longitude => params[:longitude], :customer => @customer
 		outlet = Outlet.find_nearest location
 		
 		if outlet
-			text = ENV['OUTLET_MESSAGE'].gsub(/(?=\bis\b)/, place+' ')+' '+outlet.name.gsub(',','')
+			send_message 'location_and_outlet', params[:address], outlet
 		else
-			text = ENV['NO_OUTLET_MESSAGE'].gsub(/(?=\bwe\b)/, @customer.name+' ')+' '+place
+			send_message 'location_no_outlet', params[:address]
 		end
-
-		get_response text
 		if outlet
 			send_vcard outlet
 		end
-		Message.create! :customer => @customer, :text => text
 	end
 
-	def return_surburb surburb
-		outlet = surburb.outlet
-		text = ENV['OUTLET_MESSAGE'].gsub(/(?=\bis\b)/, surburb.name+' ')+' '+outlet.name.gsub(',','')
+	# def return_surburb surburb
+	# 	outlet = surburb.outlet
+	# 	text = ENV['OUTLET_MESSAGE'].gsub(/(?=\bis\b)/, surburb.name+' ')+' '+outlet.name.gsub(',','')
 
-		get_response text
-		send_vcard outlet
-		Message.create! :customer=>@customer, :text=>text
-	end
+	# 	get_response text
+	# 	send_vcard outlet
+	# 	Message.create! :customer=>@customer, :text=>text
+	# end
 
 	def send_vcard outlet
 		contact_number = []
@@ -93,19 +86,10 @@ class ContactController < ApplicationController
 		response_vcard outlet.name.gsub(',',''), contact_number
 	end
 
-	def wrong_query
-		text = ENV['NO_SURBURB_MESSAGE'].gsub(/(?=\bPlease\b)/, @customer.name+'. ')
-		get_response text
-		Message.create! :text => text, :customer => @customer
-	end
-
 	def set_customer
 		@customer = Customer.find_by_name_and_phone_number(params[:name], params[:phone_number])
 		if @customer.nil?
 			@customer = Customer.create! phone_number: params[:phone_number], name: params[:name]
-			text = ENV['WELCOME_MESSAGE'].gsub(/(?=\bThank\b)/, @customer.name+'. ')
-			get_response text
-			Message.create! :text=>text, :customer=>@customer
 		end
 		@customer
 	end

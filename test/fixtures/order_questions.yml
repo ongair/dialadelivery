@@ -1,9 +1,17 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
 
 one:
-  order_type: free_pizza
-  text: What free Pizza would you like to have?
+  order_type: welcome
+  text: Hallo Thank you for choosing Dial-a-Delivery. Please send us your surburb or share your location via whatsapp to get the contact details of your nearest Dial-a-Delivery location.
 
 two:
-  order_type: order_complete
-  text: "Thank you for ordering with Dial-a-Delivery, your pizza should be ready in 45 minutes, we hope you will be hungry by then."
+  order_type: no_surburb
+  text: Sorry we do not yet recognize as a Surburb. Please share your location via whatsapp.
+
+three:
+  order_type: location_and_outlet
+  text: Your nearest Dial-a-Delivery location near is We are sending you their contacts shortly.
+
+four:
+  order_type: location_no_outlet
+  text: Sorry we do not yet have an outlet near
