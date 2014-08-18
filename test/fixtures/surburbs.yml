@@ -14,9 +14,14 @@
 
 one:
   name: ihub
-  outlet_id: 500320549
+  outlet: ngong_road
   approved: true
 
 two:
   name: jamuhuri
-  outlet_id: 486605684
+  outlet: junction
+  approved: true
+
+three:
+  name: kayole
+  approved: true

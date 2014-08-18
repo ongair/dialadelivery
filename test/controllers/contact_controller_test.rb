@@ -62,4 +62,12 @@ class ContactControllerTest < ActionController::TestCase
 		assert_equal true, !jogoo_rd.nil?
 		assert_equal false, jogoo_rd.approved
 	end
+
+	test "Send surburb yes but no outlet" do
+		post :begin, { phone_number: "254716085380", text: "kayole", name: "Rachael", notification_type: "MessageReceived" }
+
+		message = Message.last
+		assert_equal message.text, "Sorry Rachael we do not yet have an outlet near kayole."
+
+	end
 end

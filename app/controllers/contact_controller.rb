@@ -15,9 +15,13 @@ class ContactController < ApplicationController
 				surburb = get_surburb params[:text]
 				if surburb
 					if surburb.approved
-						send_message 'location_and_outlet', surburb.name, surburb.outlet
-						contact_numbers = get_contact_array surburb.outlet
-						send_message 'contact', "", "", contacts: contact_numbers, first_name: surburb.outlet.name.gsub(',','')
+						if surburb.outlet
+							send_message 'location_and_outlet', surburb.name, surburb.outlet
+							contact_numbers = get_contact_array surburb.outlet
+							send_message 'contact', "", "", contacts: contact_numbers, first_name: surburb.outlet.name.gsub(',','')
+						else
+							send_message 'location_no_outlet', surburb.name
+						end
 					else
 						send_message 'no_surburb', surburb.name
 					end
