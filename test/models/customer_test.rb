@@ -7,6 +7,7 @@
 #  phone_number :string(255)
 #  created_at   :datetime
 #  updated_at   :datetime
+#  can_proceed  :boolean
 #
 
 require 'test_helper'
