@@ -16,6 +16,8 @@ class ContactController < ApplicationController
 				if surburb
 					if surburb.approved
 						send_message 'location_and_outlet', surburb.name, surburb.outlet
+						contact_numbers = get_contact_array surburb.outlet
+						send_message 'contact', "", "", contacts: contact_numbers, first_name: surburb.outlet.name.gsub(',','')
 					else
 						send_message 'no_surburb', surburb.name
 					end
@@ -48,22 +50,6 @@ class ContactController < ApplicationController
 		contact_numbers
 	end
 
-	def response_vcard first_name, contact_number
-		if Rails.env.production?
-			params = {
-				'phone_number' => @customer.phone_number,
-				'token' => ENV['TOKEN'],
-				'first_name' => first_name
-			}
-			contact_number.each do |contact|
-				index = contact_number.index contact
-				params["contact_number[#{index}]"] = contact
-			end
-			url = URI.parse(ENV['API_VCARD_URL'])
-			response = Net::HTTP.post_form(url, params)
-		end
-	end
-
 	def get_surburb text
 		surburb = Surburb.where(Surburb.arel_table[:name].matches(text)).take
 	end
@@ -79,25 +65,8 @@ class ContactController < ApplicationController
 		end
 		if outlet
 			contact_numbers = get_contact_array outlet
-			send_message 'contact', contacts: contact_numbers
+			send_message 'contact', "", "", contacts: contact_numbers, first_name: outlet.name.gsub(',','')
 		end
-	end
-
-	# def return_surburb surburb
-	# 	outlet = surburb.outlet
-	# 	text = ENV['OUTLET_MESSAGE'].gsub(/(?=\bis\b)/, surburb.name+' ')+' '+outlet.name.gsub(',','')
-
-	# 	get_response text
-	# 	send_vcard outlet
-	# 	Message.create! :customer=>@customer, :text=>text
-	# end
-
-	def send_vcard outlet
-		contact_number = []
-		outlet.outlet_contacts.each do |number|
-			contact_number.push number.phone_number
-		end
-		response_vcard outlet.name.gsub(',',''), contact_number
 	end
 
 	def set_customer

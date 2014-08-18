@@ -32,6 +32,7 @@ class Message < ActiveRecord::Base
 				url = "#{ENV['API_URL']}/send"
 				response = HTTParty.post(url,body: params_config, debug_output: $stdout)
 			when 'contact'
+				params_config['first_name'] = params[:first_name]
 				url = "#{ENV['API_URL']}/send_contact"
 				contacts = params[:contacts]
 				contacts.each do |contact|

@@ -2,26 +2,26 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class ContactControllerTest < ActionController::TestCase
-	 test "should register a customer if this is the first interaction" do
-	 	customer = Customer.find_by_phone_number("254722200200")
-	 	assert customer.nil? 
+	test "should register a customer if this is the first interaction" do
+		customer = Customer.find_by_phone_number("254722200200")
+		assert customer.nil? 
 
-	 	post :begin, { phone_number: "254722200200", name: "Trevor", text: "Dial-A-Delivery", notification_type: "MessageReceived" }
+		post :begin, { phone_number: "254722200200", name: "Trevor", text: "Dial-A-Delivery", notification_type: "MessageReceived" }
 
-	 	customer = Customer.find_by_phone_number("254722200200")
-	 	assert !customer.nil? 
-	 end
+		customer = Customer.find_by_phone_number("254722200200")
+		assert !customer.nil? 
+	end
 
-	 test "Send welcome message after receipt of start word" do
-	 	message = Message.first
-	 	assert_nil message
+	test "Send welcome message after receipt of start word" do
+		message = Message.first
+		assert_nil message
 
-	 	post :begin, { phone_number: "254722200200", name: "Trevor", text: "Dial-A-Delivery", notification_type: "MessageReceived" }
-	 	
-	 	message = Message.first
+		post :begin, { phone_number: "254722200200", name: "Trevor", text: "Dial-A-Delivery", notification_type: "MessageReceived" }
+
+		message = Message.first
 		assert_equal message.customer.phone_number, "254722200200"
-	 	assert_equal message.text, "Hallo Trevor. Thank you for choosing Dial-a-Delivery. Please send us your surburb or share your location via whatsapp to get the contact details of your nearest Dial-a-Delivery location."
-	 end
+		assert_equal message.text, "Hallo Trevor. Thank you for choosing Dial-a-Delivery. Please send us your surburb or share your location via whatsapp to get the contact details of your nearest Dial-a-Delivery location."
+	end
 
 	test "Ask for location via whatsapp after receipt of not start word" do
 		post :begin, { phone_number: "254716085380", name: "Rachael", text: "Dial", notification_type: "MessageReceived" }
@@ -34,7 +34,6 @@ class ContactControllerTest < ActionController::TestCase
 
 	test "It should return the closest outlet when a user sends their location" do
 		post :begin, { phone_number: "254716085380", address: "Ngong road", name: "Rachael", notification_type: "LocationReceived", latitude: outlets(:ngong_road).latitude, longitude: outlets(:ngong_road).longitude }
-
 		message = Message.all[-2]
 		assert_equal message.text, "Your nearest Dial-a-Delivery location near Ngong road is #{outlets(:ngong_road).name}. We are sending you their contacts shortly."
 	end
@@ -49,13 +48,13 @@ class ContactControllerTest < ActionController::TestCase
 	test "It should detect a location from the text received if a user sends in the location as a word" do
 		post :begin, { phone_number: "254716085380", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" }	
 
-		message = Message.last
+		message = Message.all[-2]
 		assert_equal message.text, "Your nearest Dial-a-Delivery location near ihub is #{outlets(:ngong_road).name}. We are sending you their contacts shortly."
 	end
 
 	test "It should save an unknown location from text to an unapproved suburb" do
 		post :begin, { phone_number: "254716085380", text: "Jogoo Rd", name: "Rachael", notification_type: "MessageReceived" }
-	
+
 		message = Message.last
 		assert_equal message.text, "Sorry we do not yet recognize Jogoo Rd as a Surburb. Please share your location via whatsapp."
 
