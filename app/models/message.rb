@@ -20,7 +20,7 @@ class Message < ActiveRecord::Base
 				'text' => text
 			}
 			url = ENV['API_URL']
-			response = HttParty.post(url,body: params, debug_output: $stdout)
+			response = HTTParty.post(url,body: params, debug_output: $stdout)
 		end
 	end
 end
