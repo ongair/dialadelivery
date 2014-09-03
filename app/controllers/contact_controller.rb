@@ -64,7 +64,7 @@ class ContactController < ApplicationController
 	end
 
 	def set_customer
-		@customer = Customer.find_by_name_and_phone_number(params[:name], params[:phone_number])
+		@customer = Customer.find_by(phone_number: params[:phone_number])
 		if @customer.nil?
 			@customer = Customer.create! phone_number: params[:phone_number], name: params[:name]
 			text = OrderQuestion.find_by(order_type: "welcome").text
