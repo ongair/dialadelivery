@@ -70,4 +70,18 @@ class ContactControllerTest < ActionController::TestCase
 		assert_equal message.text, "Sorry Rachael we do not yet have an outlet near kayole."
 
 	end
-end
+	
+	test "Should send first time customer a welcome message" do
+		post :begin, { phone_number: "254716085380", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" }
+		message = Message.first
+		assert_equal message.text, "Hallo Rachael. Thank you for choosing Dial-a-Delivery"
+	end
+
+	test "Customer must be unique" do
+		Customer.delete_all
+		assert_equal 0, Customer.count
+		post :begin, { phone_number: "254716085380", text: "Ihub", name: "Rachael", notification_type: "MessageReceived" }
+		assert_equal 1, Customer.count
+		post :begin, { phone_number: "254716085380", text: "Ihub", name: "Moses", notification_type: "MessageReceived" }
+		assert_equal 1, Customer.count
+		endend
