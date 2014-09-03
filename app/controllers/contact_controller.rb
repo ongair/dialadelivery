@@ -77,10 +77,6 @@ class ContactController < ApplicationController
 		@customer = Customer.find_by(phone_number: params[:phone_number])
 		if @customer.nil?
 			@customer = Customer.create! phone_number: params[:phone_number], name: params[:name]
-			text = OrderQuestion.find_by(order_type: "welcome").text
-			text = text.gsub(/(?=\bThank\b)/, @customer.name+'. ')
-			get_response text
-			Message.create! :text=>text, :customer=>@customer
 		end
 		@customer
 	end
