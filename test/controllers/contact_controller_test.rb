@@ -84,4 +84,5 @@ class ContactControllerTest < ActionController::TestCase
 		assert_equal 1, Customer.count
 		post :begin, { phone_number: "254716085380", text: "Ihub", name: "Moses", notification_type: "MessageReceived" }
 		assert_equal 1, Customer.count
-		endend
+	end
+end
