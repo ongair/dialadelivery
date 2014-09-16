@@ -64,12 +64,10 @@ class ContactController < ApplicationController
 		
 		if outlet
 			send_message 'location_and_outlet', params[:address], outlet
-		else
-			send_message 'location_no_outlet', params[:address]
-		end
-		if outlet
 			contact_numbers = get_contact_array outlet
 			send_message 'contact', "", "", contacts: contact_numbers, first_name: outlet.name.gsub(',','')
+		else
+			send_message 'location_no_outlet', params[:address]
 		end
 	end
 
