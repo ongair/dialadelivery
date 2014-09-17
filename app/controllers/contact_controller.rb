@@ -7,7 +7,7 @@ class ContactController < ApplicationController
 
 	def begin
 		if params[:notification_type] == "LocationReceived"
-			process_location
+			process_location params[:address], params[:latitude], params[:longitude]
 		elsif params[:notification_type] == "MessageReceived"
 			if params[:text].downcase == ENV['BEGIN'].downcase
 				send_message 'welcome'
@@ -29,17 +29,9 @@ class ContactController < ApplicationController
 					surburb = Surburb.create :name=>params[:text], :approved=>false
 					coordinates = surburb.get_coordinates
 					if coordinates
-						location = Location.create! :name => surburb.name, :latitude => coordinates[0], :longitude => coordinates[1], :customer => @customer
-						outlet = Outlet.find_nearest location
-						if outlet
-							surburb.approved = true
-							surburb.save!
-							send_message 'location_and_outlet', surburb.name, outlet
-							contact_numbers = get_contact_array outlet
-							send_message 'contact', "", "", contacts: contact_numbers, first_name: outlet.name.gsub(',','')
-						else
-							send_message 'location_no_outlet', surburb.name
-						end
+						surburb.approved = true
+						surburb.save!
+						process_location params[:text], coordinates[0], coordinates[1]
 					else
 						send_message 'no_surburb', params[:text]
 					end
@@ -73,16 +65,16 @@ class ContactController < ApplicationController
 		surburb = Surburb.where(Surburb.arel_table[:name].matches(text)).take
 	end
 
-	def process_location
-		location = Location.create! :name => params[:address], :latitude => params[:latitude], :longitude => params[:longitude], :customer => @customer
+	def process_location address, latitude, longitude
+		location = Location.create! :name => address, :latitude => latitude, :longitude => longitude, :customer => @customer
 		outlet = Outlet.find_nearest location
 
 		if outlet
-			send_message 'location_and_outlet', params[:address], outlet
+			send_message 'location_and_outlet', address, outlet
 			contact_numbers = get_contact_array outlet
 			send_message 'contact', "", "", contacts: contact_numbers, first_name: outlet.name.gsub(',','')
 		else
-			send_message 'location_no_outlet', params[:address]
+			send_message 'location_no_outlet', address
 		end
 	end
 
