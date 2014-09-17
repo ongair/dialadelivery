@@ -21,4 +21,9 @@ junction:
   name: Pizza Inn Junction
   latitude: -1.298225
   longitude: 36.762011
+town:
+  name: Pizza Inn Moi Avenue
+  latitude: -1.2843045
+  longitude: 36.8250233
+
 

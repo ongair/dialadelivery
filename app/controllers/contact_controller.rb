@@ -26,8 +26,23 @@ class ContactController < ApplicationController
 						send_message 'no_surburb', surburb.name
 					end
 				else
-					Surburb.create :name=>params[:text], :approved=>false
-					send_message 'no_surburb', params[:text]
+					surburb = Surburb.create :name=>params[:text], :approved=>false
+					coordinates = surburb.get_coordinates
+					if coordinates
+						location = Location.create! :name => surburb.name, :latitude => coordinates[0], :longitude => coordinates[1], :customer => @customer
+						outlet = Outlet.find_nearest location
+						if outlet
+							surburb.approved = true
+							surburb.save!
+							send_message 'location_and_outlet', surburb.name, outlet
+							contact_numbers = get_contact_array outlet
+							send_message 'contact', "", "", contacts: contact_numbers, first_name: outlet.name.gsub(',','')
+						else
+							send_message 'location_no_outlet', surburb.name
+						end
+					else
+						send_message 'no_surburb', params[:text]
+					end
 				end
 			end
 		end
@@ -61,7 +76,7 @@ class ContactController < ApplicationController
 	def process_location
 		location = Location.create! :name => params[:address], :latitude => params[:latitude], :longitude => params[:longitude], :customer => @customer
 		outlet = Outlet.find_nearest location
-		
+
 		if outlet
 			send_message 'location_and_outlet', params[:address], outlet
 			contact_numbers = get_contact_array outlet

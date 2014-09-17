@@ -29,7 +29,7 @@ class ContactControllerTest < ActionController::TestCase
 		message = Message.first
 
 		assert_equal message.customer.phone_number, "254716085380"
-		assert_equal message.text, "Sorry we do not yet recognize Dial as a Surburb. Please share your location via whatsapp."
+		assert_equal message.text, "Sorry Rachael we do not yet have an outlet near Dial."
 	end
 
 	test "It should return the closest outlet when a user sends their location" do
@@ -53,15 +53,31 @@ class ContactControllerTest < ActionController::TestCase
 		assert_equal message.text, "Your nearest Dial-a-Delivery location near ihub is #{outlets(:ngong_road).name}. We are sending you their contacts shortly."
 	end
 
-	test "It should save an unknown location from text to an unapproved suburb" do
+	test "Search maps using location name on and get nearest outlet" do
+		Message.delete_all
 		post :begin, { phone_number: "254716085380", text: "Jogoo Rd", name: "Rachael", notification_type: "MessageReceived" }
 
-		message = Message.last
-		assert_equal message.text, "Sorry we do not yet recognize Jogoo Rd as a Surburb. Please share your location via whatsapp."
+		message = Message.first
+		assert_equal message.text, "Your nearest Dial-a-Delivery location near Jogoo Rd is #{outlets(:town).name}. We are sending you their contacts shortly."
+	end
 
-		jogoo_rd = Surburb.find_by(name: "Jogoo Rd", approved: false)
-		assert_equal true, !jogoo_rd.nil?
-		assert_equal false, jogoo_rd.approved
+	test "Approve Surburb after located from google maps" do
+		Surburb.delete_all
+		post :begin, { phone_number: "254716085380", text: "Jogoo Rd", name: "Rachael", notification_type: "MessageReceived" }
+
+		surburb = Surburb.first
+		assert_equal true, surburb.approved
+	end
+
+	test "It should save an unknown location from text to an unapproved suburb" do
+		post :begin, { phone_number: "254716085380", text: "Random String", name: "Rachael", notification_type: "MessageReceived" }
+
+		message = Message.last
+		assert_equal message.text, "Sorry we do not yet recognize Random String as a Surburb. Please share your location via whatsapp."
+
+		surb = Surburb.find_by(name: "Random String", approved: false)
+		assert_equal true, !surb.nil?
+		assert_equal false, surb.approved
 	end
 
 	test "Send surburb yes but no outlet" do

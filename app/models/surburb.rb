@@ -12,4 +12,8 @@
 
 class Surburb < ActiveRecord::Base
   belongs_to :outlet
+
+  def get_coordinates
+  	coordinates = Geocoder.coordinates(self.name)
+  end
 end
