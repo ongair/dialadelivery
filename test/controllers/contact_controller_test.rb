@@ -2,7 +2,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class ContactControllerTest < ActionController::TestCase
-	test "should register a customer if this is the first interaction" do
+	test "Should register a customer if this is the first interaction" do
 		customer = Customer.find_by_phone_number("254722200200")
 		assert customer.nil? 
 

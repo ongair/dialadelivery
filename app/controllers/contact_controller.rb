@@ -68,8 +68,12 @@ class ContactController < ApplicationController
 	def process_location address, latitude, longitude
 		location = Location.create! :name => address, :latitude => latitude, :longitude => longitude, :customer => @customer
 		outlet = Outlet.find_nearest location
-
 		if outlet
+			surburb = Surburb.find_by(name: address)
+			if surburb and surburb.outlet.nil?
+				surburb.outlet = outlet
+				surburb.save!
+			end
 			send_message 'location_and_outlet', address, outlet
 			contact_numbers = get_contact_array outlet
 			send_message 'contact', "", "", contacts: contact_numbers, first_name: outlet.name.gsub(',','')
